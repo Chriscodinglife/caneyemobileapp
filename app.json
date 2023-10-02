@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "caneyemobileapp",
-    "slug": "caneyemobileapp",
+    "name": "Can Eye",
+    "slug": "caneye",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./images/caneyeapp.png",
+    "scheme": "caneyeapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./images/caneyeapp.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -15,7 +16,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "icon": "./images/caneyeapp.png",
+      "bundleIdentifier": "com.chriscodingapp.caneye",
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyCtvMQ8y_ZAh7QPCLNWh_iAmR9ffkhcUns"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +30,15 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./images/caneyeapp.png"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f2ea4416-bdaf-4965-b210-b232efb8a1b8"
+      }
     }
   }
 }

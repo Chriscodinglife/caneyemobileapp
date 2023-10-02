@@ -1,0 +1,273 @@
+data = {
+    "description": "FOOD BAZAAR, Northern Boulevard, Queens, NY, USA",
+    "matched_substrings": [
+        {
+            "length": 4,
+            "offset": 0
+        }
+    ],
+    "place_id": "ChIJh-ZryyVfwokR-tg5HCfSNtI",
+    "reference": "ChIJh-ZryyVfwokR-tg5HCfSNtI",
+    "structured_formatting": {
+        "main_text": "FOOD BAZAAR",
+        "main_text_matched_substrings": [
+            [Object
+            ]
+        ],
+        "secondary_text": "Northern Boulevard, Queens, NY, USA"
+    },
+    "terms": [
+        {
+            "offset": 0,
+            "value": "FOOD BAZAAR"
+        },
+        {
+            "offset": 13,
+            "value": "Northern Boulevard"
+        },
+        {
+            "offset": 33,
+            "value": "Queens"
+        },
+        {
+            "offset": 41,
+            "value": "NY"
+        },
+        {
+            "offset": 45,
+            "value": "USA"
+        }
+    ],
+    "types": [
+        "supermarket",
+        "grocery_or_supermarket",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+    ]
+} 
+
+details = {
+    "address_components": [
+        {
+            "long_name": "42-02",
+            "short_name": "42-02",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "Northern Boulevard",
+            "short_name": "Northern Blvd",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "Long Island City",
+            "short_name": "LIC",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "Queens",
+            "short_name": "Queens",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "Queens County",
+            "short_name": "Queens County",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "New York",
+            "short_name": "NY",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "United States",
+            "short_name": "US",
+            "types": [Array
+            ]
+        },
+        {
+            "long_name": "11101",
+            "short_name": "11101",
+            "types": [Array
+            ]
+        }
+    ],
+    "adr_address": "<span class=\"street-address\">42-02 Northern Blvd</span>, <span class=\"locality\">Queens</span>, <span class=\"region\">NY</span> <span class=\"postal-code\">11101</span>, <span class=\"country-name\">USA</span>",
+    "business_status": "OPERATIONAL",
+    "current_opening_hours": {
+        "open_now": true,
+        "periods": [
+            [Object
+            ]
+        ],
+        "weekday_text": [
+            "Monday: Open 24 hours",
+            "Tuesday: Open 24 hours",
+            "Wednesday: Open 24 hours",
+            "Thursday: Open 24 hours",
+            "Friday: Open 24 hours",
+            "Saturday: Open 24 hours",
+            "Sunday: Open 24 hours"
+        ]
+    },
+    "delivery": true,
+    "editorial_summary": {
+        "language": "en",
+        "overview": "Supermarket chain offering traditional groceries & produce, along with international items."
+    },
+    "formatted_address": "42-02 Northern Blvd, Queens, NY 11101, USA",
+    "formatted_phone_number": "(347) 448-8860",
+    "geometry": {
+        "location": {
+            "lat": 40.75212489999999,
+            "lng": -73.921528
+        },
+        "viewport": {
+            "northeast": [Object
+            ],
+            "southwest": [Object
+            ]
+        }
+    },
+    "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/shopping-71.png",
+    "icon_background_color": "#4B96F3",
+    "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/shoppingcart_pinlet",
+    "international_phone_number": "+1 347-448-8860",
+    "name": "FOOD BAZAAR",
+    "opening_hours": {
+        "open_now": true,
+        "periods": [
+            [Object
+            ]
+        ],
+        "weekday_text": [
+            "Monday: Open 24 hours",
+            "Tuesday: Open 24 hours",
+            "Wednesday: Open 24 hours",
+            "Thursday: Open 24 hours",
+            "Friday: Open 24 hours",
+            "Saturday: Open 24 hours",
+            "Sunday: Open 24 hours"
+        ]
+    },
+    "photos": [
+        {
+            "height": 4032,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zgJlG_16O6sbZkP65E7RS77kwypCSAFlYIpXOoUuTN1kS6B186nLthfKbuJMfSaLmJ76QP66-Sn6OAvUnlLHpYDvUWYe73vyc_c_ehlEoXLTYZe8cNBXPvz4JKhMrYKgdzIjFThT0EtGkJikVECcDezwazzz8D21XojQqmGWYqDjW3u",
+            "width": 3024
+        },
+        {
+            "height": 3024,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zi1BXjZHlk744WDl5AjXp3E-oV870oNZYv2xHb6xNFVj1f1tm18fBxWmvGLITishZTd6r6inLJwS0ovSNq6NqS_mnAjIAfpvrdWZLwHuXeW1-_E0lcLd_0pxQup79UhqxQnp_VopFuP-vMVnKXu3C0NuwgRJD3xREUf6E6cbRb8Q2iI",
+            "width": 4032
+        },
+        {
+            "height": 4000,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zgL_8NlsI4FA-ql75E4d_uv8fInrk39lJF-NroL0W0nHUOF3phYH8wf-XYwDGK2gmhzOyKQ3kOl2Be9C5TTUHi2Ijxb2xOF79rKK1LRYwaCgWz4FyGMgKfIutO5064Ov7ptpiL6RY-CJqDDxM0fUTRAgOqvAmE8ddUNFZI6zLWZCxav",
+            "width": 3000
+        },
+        {
+            "height": 3036,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zjcZi136lE83gb-8oXJ8vHkTA0toIcP8CiRBTpvFwKxgGrqujiY-jekFthTwNyxi_gSjB6Ir1g2A09O02mM_wOiaXW7xfJFt4gdkFZPMAtQb6vU0EU4xjoJ68si2r49-z4iYAOhLDuc7Zul1h0SBdImZXJRMvK3dASOIy4IAySBujFu",
+            "width": 4048
+        },
+        {
+            "height": 4032,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zhQkfxjYdOIYjwTWgvdPhqodOXZINpZc3wtT8BtGXIesnIfYgkfaAaFmnjdNQMOFzP1jgNP3vy8lmNsHkPQF5dy1x7kWfdFwNYig99E5qJrImFiyKNUFNXwuy-hbx1jnSutaYZGI8SiULY3D-dE1FRHkKEkvBdMa0jSQbfHgjMRrV2c",
+            "width": 2268
+        },
+        {
+            "height": 1920,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zjV9cyxfJ3v8ppCAgoH86ptmaE3hIvrx2eX70seWa9dyVZlVdr3y2dA9rqUNYEYmeQFyeqcg0SbvYyZemL2DvszCC59P8WPbguQYIxgwmH-moFXTZBBos26oCYElPiss1xN0GqUCOFs1OxzOFaCSYaGTbbY2wfHhrgJC9WTEYl_W3hI",
+            "width": 1080
+        },
+        {
+            "height": 4032,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zib6kI1atOVr90TVl00rd-KPh41NRJ6NvMmojz95xKM3sfNRkN-ZscJc2efWKKzzeH3YMJTIjzkCDAcxmzPKAukjjv_DZkpQbSAvjGaHAQu6wN_pyXd8YvtlbFdzSTXA6FMRwP1j9T_HpcOP3zPtzU4TduXdhIfnKPMLB0K0rkb43w",
+            "width": 3024
+        },
+        {
+            "height": 4000,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zhFYhjXxpG9kH3UHHVGAsHiiDjiLKVTTYHsuy_e6keVXiABAGU37oryEzqNPJHMzyxyuSCijTu7lSUWlEnax1hoc6rbbK6BKvoWPT6f5R_Duj2NUgwmsdIziYLj5SdxgdWZ5Tq1HryUHT1Jwx5LMz5D_pRTlz2N4zZU1KOmaGJHWNUR",
+            "width": 3000
+        },
+        {
+            "height": 2988,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zhCqiLvbyuoEKeCMvqZ3jPHDXpO71lwRaXrMxdFwoNI_V-MLv_1TmXal6a7PtqylBINlGK8hSCSlwxjk8Az-rnS_j_V0D6yaH4W83sqiLHNssOE8eTcamxEg_sI3jJ0WzPhn6iovio59kcxVp0LN-ChOe-gQgREauMPaoOB61KDPYCR",
+            "width": 5312
+        },
+        {
+            "height": 1920,
+            "html_attributions": [Array
+            ],
+            "photo_reference": "ATJ83zgbIbPhPW9uzj9Gbv6rnX4WvoFlt_saHOa0ugfJ2g0HOY2RUI5EevTv5I79a4s1ZECCFdjDEndSplaxV5SWBmV_4-Qmcw9awFZ80dErEeHmp0eRbRrMopIOqnuRtHQzSmginkoKYbbL6VRUATsmiu4UKfHRC9cKC-2WzMQDkHqco5tv",
+            "width": 1080
+        }
+    ],
+    "place_id": "ChIJh-ZryyVfwokR-tg5HCfSNtI",
+    "plus_code": {
+        "compound_code": "Q32H+R9 New York, NY, USA",
+        "global_code": "87G8Q32H+R9"
+    },
+    "rating": 4.5,
+    "reference": "ChIJh-ZryyVfwokR-tg5HCfSNtI",
+    "reviews": [
+        {
+            "author_name": "Kalu Thapa",
+            "author_url": "https://www.google.com/maps/contrib/111714149788703984183/reviews",
+            "language": "en",
+            "original_language": "en",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjX8yMkjGP9uBv-y8L1H27ey-bnr3oLdzDMFl73F_Ry7n5Ug=s128-c0x00000000-cc-rp-mo-ba4",
+            "rating": 4,
+            "relative_time_description": "a month ago",
+            "text": "Huge selection of items including meat seafood and dairy products but the prices are a bit expensive comparing other stores.",
+            "time": 1691333158,
+            "translated": false
+        },
+        {
+            "author_name": "Keisha Woods",
+            "author_url": "https://www.google.com/maps/contrib/111130788068900152096/reviews",
+            "language": "en",
+            "original_language": "en",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWMwoRu9sMiJFbBat-2SAS5XqxMApa8onJN_I3t0P3jNPPy=s128-c0x00000000-cc-rp-mo-ba4",
+            "rating": 5,
+            "relative_time_description": "4 weeks ago",
+            "text": "They are always well stocked.  I love shopping here.   The meats are always fresh and so are the veggies.   They also have a different variety of culture foods.   Great staff.  You can get it all from this supermarket.   Prices are very reasonable.",
+            "time": 1692964272,
+            "translated": false
+        },
+        {
+            "author_name": "Daniel Kantor",
+            "author_url": "https://www.google.com/maps/contrib/109253514529792785422/reviews",
+            "language": "en",
+            "original_language": "en",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocLKoE6Vh5YRT0c-FbhjaaE9V7j5dQ2XHPn-LjlNKEgk=s128-c0x00000000-cc-rp-mo-ba4",
+            "rating": 4,
+            "relative_time_description": "a month ago",
+            "text": "Amazing store.  They have most everything you could want, in virtually every department, and most major world cuisines are represented.  Their fish department stands out as particularly impressive(they offer fish cleaning/fileting of a wide variety of whole fish that are on display and are visibly super fresh).
+The organic produce selection could be substantially improved.", "time": 1691262816, "translated": false}, {"author_name": "David Q (davqh)", "author_url": "https: //www.google.com/maps/contrib/103718578633200551105/reviews", "language": "en", "original_language": "en", "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWhxf10AG18f7O0ih7j7e99INtDVDj2wVpGTjhEBpS6-A=s128-c0x00000000-cc-rp-mo-ba5", "rating": 4, "relative_time_description": "5 months ago", "text": "This review is for the sandwiches only and not the actual supermarket. The sandwiches at this supermarket are as good as they get in NYC. Not only are the sandwiches well-made and delicious but they are affordable. All sandwiches are made fresh right before you.", "time": 1682302013, "translated": false}, {"author_name": "Lana B. Baroni", "author_url": "https://www.google.com/maps/contrib/114017476033453319266/reviews", "language": "en", "original_language": "en", "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWiESQFY3X3ZyUpbXZaISAxIPj59mN4piL_-LhKSQ7wt2k=s128-c0x00000000-cc-rp-mo-ba4", "rating": 4, "relative_time_description": "3 weeks ago", "text": "Enormous variety of products. The meat has a very good price. Vegetables and fruits are a little more expensive than what I usually pay for. They have a lot of products from different countries, which for me it's the best thing about this place. They have a lot of parking spaces if you go by car. One problem is that sometimes it gets too crowded, the lines can be huge on those days.", "time": 1693167419, "translated": false}], "takeout": true, "types": ["supermarket", "grocery_or_supermarket", "food", "store", "point_of_interest", "establishment"], "url": "https://maps.google.com/?cid=15147525462126352634", "user_ratings_total": 5361, "utc_offset": -240, "vicinity": "42-02 Northern Boulevard, Queens", "website": "https://www.foodbazaar.com/find-your-store/", "wheelchair_accessible_entrance": true}

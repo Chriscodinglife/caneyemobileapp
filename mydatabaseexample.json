@@ -1,0 +1,22 @@
+{
+  "ChIJ9WoxSJRfwokR8iOr2nIc78I": {
+    "address": "99-10 Astoria Blvd, Queens, NY 11369, USA",
+    "location": {
+      "latitude": 40.762720538058744,
+      "longitude": -73.87019570900488
+    },
+    "name": "Trade Fair",
+    "numMachines": 3,
+    "placeID": "ChIJ9WoxSJRfwokR8iOr2nIc78I"
+  },
+  "ChIJT4Kd22BfwokR0JwAWGvZx44": {
+    "address": "34-60 48th St, Queens, NY 11101, USA",
+    "location": {
+      "latitude": 40.75205,
+      "longitude": -73.91541
+    },
+    "name": "BJ's Wholesale Club",
+    "numMachines": 5,
+    "placeID": "ChIJT4Kd22BfwokR0JwAWGvZx44"
+  }
+}
