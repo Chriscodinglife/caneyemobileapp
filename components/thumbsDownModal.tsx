@@ -1,6 +1,5 @@
 import * as Crypto from 'expo-crypto';
 import { Platform } from "react-native";
-import * as Clipboard from "expo-clipboard";
 import { storage } from "../firebaseConfig";
 import { Location, Review} from "./Location";
 import * as ImagePicker from "expo-image-picker";
