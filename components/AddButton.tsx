@@ -32,7 +32,7 @@ const AddButton: React.FC<AddButtonProps> = ({ onClick }) => {
                     style={setStyle()}
                     onPressIn={() => inPressButton()}
                     onPressOut={() => setButtonPressed(false)}>
-                    <MaterialIcons name="add" size={38} color="#25292e" />
+                    <MaterialIcons name="add" size={38} color="#fff" />
                 </Pressable>
         </View>
     )
@@ -40,12 +40,9 @@ const AddButton: React.FC<AddButtonProps> = ({ onClick }) => {
 
 const styles = StyleSheet.create({
     circleButtonContainer: {
-        width: 84,
-        height: 84,
+        width: 70,
+        height: 70,
         marginHorizontal: 60,
-        borderWidth: 4,
-        borderColor: "#000000",
-        borderRadius: 40,
         padding: 3,
     },
     whiteCircleButton: {
@@ -53,14 +50,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "center",
         borderRadius: 30,
-        backgroundColor: "#fff"
+        backgroundColor: "#1EB2EB",
+        shadowColor: "#00AEED",
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
+        shadowOffset: {width: 0, height: 2},
     },
     greyCircleButton: {
         flex: 1,
         justifyContent: 'center',
         alignItems: "center",
         borderRadius: 30,
-        backgroundColor: "#F0F0F0"
+        backgroundColor: "#11A0D4"
     },
 });
 

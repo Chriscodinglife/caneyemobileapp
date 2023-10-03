@@ -4,7 +4,7 @@ import { machineDB } from './firebaseConfig';
 import AddButton from './components/AddButton';
 import React, { useEffect, useState } from 'react';
 import { ref, child, get } from 'firebase/database';
-import LocationList from './components/LocationList';
+import LocationListModal from './components/LocationListModal';
 import LocationMarkers from './components/LocationMarkers';
 import GoogleSearchBar from './components/GoogleSearchBar';
 import NewLocationModal from './components/newLocationModal';
@@ -121,24 +121,7 @@ export default function App() {
         <View style={styles.addButtonContainer}>
           <AddButton onClick={addButtonClickHandler}/>
         </View>
-        <Modal
-          animationType='slide'
-          transparent={true}
-          visible={isLocationListVisible}
-          onRequestClose={closeListModal}
-        >
-          <View style={styles.locationListModalContainer}>
-            <TouchableHighlight
-              style={styles.closeButton}
-              onPress={closeListModal}
-            >
-              <Text style={styles.closeButtonText}>X</Text>
-            </TouchableHighlight>
-            <View style={styles.locationListModalContent}>
-              <LocationList locations={locations}/>
-            </View>
-          </View>
-        </Modal>
+          <LocationListModal locations={locations} closeListModal={closeListModal} isLocationListVisible={isLocationListVisible}/>
         <StatusBar style="auto" />
       </View>
     </AppContextProvider>
@@ -151,9 +134,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center'
   },
-  locationMarkerContainer: {
-    width: "100%"
-  },
   addButtonContainer : {
     position: 'absolute',
     bottom: 80
@@ -162,28 +142,4 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%'
   },
-  locationListModalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  locationListModalContent: {
-    backgroundColor: 'white',
-    marginTop: 20,
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: '75%'
-  },
-  closeButton: {
-    alignItems: 'flex-end',
-    padding: 8,
-    marginRight: 15,
-    top: 70,
-    zIndex: 1
-  },
-  closeButtonText: {
-    color: 'blue',
-    fontWeight: "bold",
-    fontSize: 20
-  }
 });

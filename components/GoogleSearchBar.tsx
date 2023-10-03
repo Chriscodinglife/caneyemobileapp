@@ -1,4 +1,6 @@
+import { StyleSheet } from 'react-native';
 import { Location, apiKey } from './Location';
+
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 type GoogleSearchBarProps = {
@@ -25,6 +27,10 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openNewLocationModal 
             openNewLocationModal(newLocation)
           }}
           fetchDetails={true}
+          textInputProps={{
+            placeholderTextColor: 'white', // Text color
+            style: searchBarStyle.searchBarStyle
+          }}
           query={{
             key: `${apiKey}`, 
             language: 'en',
@@ -34,10 +40,10 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openNewLocationModal 
     )
 };
 
-const searchBarStyle = {
+const searchBarStyle = StyleSheet.create({
     container: {
       position: 'absolute',
-      top: 50,
+      top: 70,
       left: 0,
       right: 0,
       zIndex: 1,
@@ -48,6 +54,16 @@ const searchBarStyle = {
     description: {
       fontWeight: 'bold',
     },
-};
+    searchBarStyle: {
+      flex: 1,
+      justifyContent: 'center',
+      color: 'white', // Text color
+      backgroundColor: '#53E601', // Background color
+      borderRadius: 20, // Rounded edges
+      marginHorizontal: 30,
+      padding: 20, // Add padding to the input
+      fontWeight: 'bold',
+    }
+});
 
 export default GoogleSearchBar;
