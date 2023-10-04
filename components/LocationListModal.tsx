@@ -38,7 +38,7 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
             </TouchableOpacity>
           <Text style={styles.locationListSubHeader}>What's in your area</Text>
           <Text style={styles.locationListHeader}>Local Recycle Machines</Text>
-          <ScrollView style={styles.flatlist}>
+          <ScrollView>
             { locations.map( (location, index) => { 
               return (
                 <TouchableOpacity key={index} style={styles.listItem} onPress={() => openMarkerModal(index)}>

@@ -1,32 +1,32 @@
 import React from 'react';
 import { Review } from './Location';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button} from 'react-native';
 
 type LocationReviewListProps = {
     reviews?: Review[];
+    closeMarkerModal: () => void;
 }
 
 
 
-const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews }) => {
+const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews, closeMarkerModal }) => {
   return (
     <View style={styles.masterView}>
-      <Text style={styles.usernameHeader}>
-        See what others had to say about this place:
-      </Text>
       <ScrollView>
         { reviews?.map( (review, index) => { 
           return ( 
             <View key={index} style={styles.listItem}>
-                <Text>{review.date}</Text>
-                <Text>{review.message}</Text>
-                <Text>{review.user}</Text>
-                { review.imageUri ? (
+              { review.imageUri ? (
                   <>
                   <Image source={{ uri: review.imageUri}} style={styles.imageUriStyle} />
                   </>
                 )
               : (<></>) }
+                <View style={styles.text}>
+                  <Text style={styles.date}>{review.date}</Text>
+                  <Text style={styles.message}>{review.message}</Text>
+                  <Text style={styles.user}>- {review.user}</Text>
+                </View>
             </View>
           )
         })}
@@ -37,26 +37,47 @@ const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews }) => {
 
 const styles = StyleSheet.create({
     masterView: {
-      flex: 1
+      flexGrow: 1,
+      flexDirection: 'column',
+      paddingHorizontal: 20
     },
     listItem: {
-      padding: 1,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
-      margin: 1,
-      height: 120,
+      flex: 1,
+      flexDirection: 'row',
+      height: 75,
+      padding: 15,
+      margin: 10,
+      backgroundColor: 'white',
+      borderRadius: 5,
+      shadowColor: 'black',
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      shadowOffset: { height: 2, width: 0}
+
     },
-    flatlist: {
-      flex: 1
+    text: {
+      flex: 1,
+      flexDirection: 'column',
+      paddingLeft: 10
     },
-    usernameHeader: {
-      fontSize: 15,
-      padding: 10
+    date: {
+      alignSelf: 'flex-end',
+      fontSize: 10,
+      color: 'grey'
+    },
+    message: {
+      fontSize: 12,
+    },
+    user: {
+      fontSize: 9,
     },
     imageUriStyle: {
-      height: 60,
-      width: 60
-    }
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      alignSelf: 'center',
+      justifyContent: 'center'
+    },
   });
 
 export default LocationReviewList
