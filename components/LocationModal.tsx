@@ -9,6 +9,7 @@ import LocationReviewList from './LocationReviewList';
 import { ref, child, update, get } from 'firebase/database';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import ReportMachinesModal from './ReportMachinesModal';
 
 type LocationModalProps = {
   index: number;
@@ -24,6 +25,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
   const [currentLocation, setCurrentLocation] = useState(location);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [thumbsDownModalVisible, setThumbsdownModalVisible] = useState(false);
+  const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
 
   const handleThumbsUp = () => {
 
@@ -112,10 +114,20 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
               </View>
             </ImageBackground>
             <View style={styles.reviewActions}>
+              <Text style={styles.reviewHeader}>Tell us what you saw</Text>
               { user ? (
                 <>
-                  <Text style={styles.reviewHeader}>What was your experience like here?</Text>
-                  <View style={styles.reviewButtonsRow}>
+                  <View>
+                    <TouchableOpacity style={styles.reportButton} onPress={() => setReportMachinesModalVisible(true)}>
+                      <Text style={styles.reportButtonText}>Report Machines</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ReportMachinesModal
+                    reportMachinesModalVisible={reportMachinesModalVisible}
+                    location={location}
+                    setCurrentLocation={setCurrentLocation}
+                    setReportMachinesModalVisible={setReportMachinesModalVisible} />
+                  {/* <View style={styles.reviewButtonsRow}>
                     <TouchableOpacity style={styles.thumbsUpButtonBox} onPress={() => handleThumbsUp()}>
                       <MaterialIcons name='thumb-up' style={styles.thumbsUpButton} />
                     </TouchableOpacity>
@@ -127,12 +139,14 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
                     thumbsDownModalVisible={thumbsDownModalVisible} 
                     location={location}
                     setCurrentLocation={setCurrentLocation} 
-                    setThumbsdownModalVisible={setThumbsdownModalVisible}/>
+                    setThumbsdownModalVisible={setThumbsdownModalVisible}/> */}
                 </>
               )
               : (
                 <>
-                  <Button title="Login first to add this to the map" onPress={() => {setLoginModalVisible(true)}} />
+                  <View style={styles.loginPrompt}>
+                    <Button title="Login or Create An Account First to Add Reports" onPress={() => {setLoginModalVisible(true)}} />
+                  </View>
                   <LoginModal
                     loginModalVisible={loginModalVisible}
                     setLoginModalVisible={() => setLoginModalVisible(false)} />
@@ -217,6 +231,23 @@ const styles = StyleSheet.create({
       shadowRadius: 3,
       shadowOffset: {width: 0, height: 0},
     },
+    reportButton: {
+      alignSelf: 'center',
+      backgroundColor: "#FF8900",
+      borderRadius: 10,
+      paddingHorizontal: 60,
+      marginVertical: 15,
+      shadowColor: "#00AEED",
+      shadowOpacity: 0.5,
+      shadowRadius: 4,
+      shadowOffset: {width: 0, height: 2},
+    },
+    reportButtonText: {
+      color: 'white',
+      fontSize: 15,
+      fontWeight: 'bold',
+      paddingVertical: 20
+    },
     reviewActions: {
       flex: 1,
       top: -250,
@@ -289,7 +320,9 @@ const styles = StyleSheet.create({
       fontSize: 15,
       fontWeight: '500',
       paddingVertical: 8
-
+    },
+    loginPrompt: {
+      paddingVertical: 20
     }
 });
 

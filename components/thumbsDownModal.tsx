@@ -41,7 +41,6 @@ const ThumbsDownModal: React.FC<ThumbsDownModalProps> = (props: ThumbsDownModalP
     props.setThumbsdownModalVisible(false);
     setImageUri(null);
 
-
   };
 
 
