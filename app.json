@@ -8,7 +8,7 @@
     "scheme": "caneyeapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./images/caneyeapp.png",
+      "image": "./images/caneye_splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
