@@ -5,9 +5,9 @@ import { Location, Review} from "./Location";
 import * as ImagePicker from "expo-image-picker";
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
-import { ref as refdb, child, update, get } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref as refdb, child, update, get } from 'firebase/database';
 import { View, Text, Modal, StyleSheet, TextInput, Button, Image, LogBox, ActivityIndicator, Share, StatusBar } from 'react-native';
 
 

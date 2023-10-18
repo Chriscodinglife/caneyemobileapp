@@ -1,6 +1,6 @@
 import { Location } from './Location';
 import React, { useState, Dispatch, SetStateAction } from 'react';
-import { View, Text, Modal, Button, TextInput } from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity } from 'react-native';
 
 // Set some types so we can track the status across different machines
 type MachineIndex = number;
@@ -132,6 +132,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
+
     return (
         <Modal
         animationType="slide"
@@ -139,40 +140,103 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         visible={props.reportMachinesModalVisible}
         onRequestClose={() => handleClose()}
         >
-        <View style={{ marginTop: 300 }}>
-            <View>
-            {step === 1 || step === 2 || step === 3 ? (
-                <>
-                <Text>
-                    {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
-                </Text>
-                <Text>
-                    How many{' '}
-                    {step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'} recycling machines are there?
-                </Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
-                    <Text>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
-                    <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+            <View style={styles.mainView}>
+                <View style={styles.headerBox}>  
+                    {step === 1 || step === 2 || step === 3 ? (
+                        <>
+                            <View> 
+                                <TouchableOpacity onPress={() => handleClose()}>
+                                    <Text style={styles.closeButtonText}>{`<-`}</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.mainHeader}>
+                                    {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
+                                </Text>
+                                <Text style={styles.subMainHeader}>
+                                    How many{' '}{step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'} recycling machines are here at {props.location.name}?
+                                </Text>
+                            </View>
+                            
+                        </>
+                    ) : null}
                 </View>
-                {renderMachines(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')}
-                </>
-            ) : null}
-            {step === 1 || step === 2 ? (
-                <>
-                    <Button title="Next" onPress={handleNext} />
-                </>
-            ) : (
-                <>
-                    <Button title="Submit" onPress={() => handleClose()} />
-                </>
-            )}
-            
+                <View>
+                    {step === 1 || step === 2 || step === 3 ? (
+                        <>
+                            {renderMachines(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')}
+                        </>
+                    ) : null}
+                </View>
+                <View>
+                    {step === 1 || step === 2 || step === 3 ? (
+                        <>
+                            <View style={styles.addButtonsBox}>
+                                <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                                    <Text>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
+                                <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                            </View>
+                        </>
+                    ) : null}
+                    {step === 1 || step === 2 ? (
+                        <>
+                            <View style={styles.nextSubmitButton}>
+                                <Button title="Next" onPress={handleNext} />
+                            </View>
+                        </>
+                    ) : (
+                        <>
+                            <Button title="Submit" onPress={() => handleClose()} />
+                        </>
+                    )}
+                </View>
             </View>
-            <Button title="Close" onPress={() => handleClose()}></Button>
-        </View>
         </Modal>
     );
 };
+
+
+const styles = StyleSheet.create({
+    mainView: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: 30
+    },
+    closeButtonText: {
+        color: 'grey',
+        fontWeight: "bold",
+        fontSize: 20,
+        shadowColor: 'white',
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+        shadowOffset: { height: 0, width: 0},
+        paddingVertical: 30
+    },
+    headerBox: {
+        alignItems: 'flex-start',
+        paddingTop: 20,
+    },
+    mainHeader: {
+        fontSize: 25,
+        fontWeight: 'bold'
+
+    },
+    subMainHeader: {
+        fontSize: 18,
+        fontWeight: '500',
+        paddingTop: 10
+    },
+    addButtonsBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        alignContent: 'flex-end',
+        paddingVertical: 30
+    },
+    nextSubmitButton: {
+        backgroundColor: 'blue',
+        color: 'white',
+        padding: 10
+    }
+})
 
 export default ReportMachinesModal;
