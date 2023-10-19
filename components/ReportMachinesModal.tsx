@@ -1,6 +1,6 @@
 import { Location } from './Location';
 import React, { useState, Dispatch, SetStateAction } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 // Set some types so we can track the status across different machines
 type MachineIndex = number;
@@ -118,15 +118,29 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         const currentMachineData = { ...machineData[machineType] };
         const machines = Array(currentMachineData.count).fill(0);
 
-        return machines.map((_, index) => (
-        <View key={index}>
-            <Text>{capitalizeFirstLetter(machineType)} Machine {index + 1}</Text>
-            <Button title="Thumbs Up" onPress={() => handleThumbsUp(machineType, index)} />
-            <Button title="Needs Repair" onPress={() => handleNeedsRepair(machineType, index)} />
-        </View>
-        ));
+        return (
+            <View style={styles.scrollMachines}>
+              <ScrollView>
+                { machines?.map( (machine, index) => { 
+                    const status = currentMachineData.status[index];
+                  return ( 
+                    <View style={styles.machineRow} key={index}>
+                        <Text style={styles.machineRowName}>{capitalizeFirstLetter(machineType)} Machine {index + 1} </Text>
+                        <TouchableOpacity style={status === 'thumbsUp' ? styles.greenButton : styles.machineRowButtonFlex} onPress={() => handleThumbsUp(machineType, index)}> 
+                            <Text style={styles.machineRowThumbs}>👍</Text>
+                            <Text>{`Looks\nGood!`}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={status !== 'thumbsUp' ? styles.redButton : styles.machineRowButtonFlex} onPress={() => handleNeedsRepair(machineType, index)}>
+                            <Text style={styles.machineRowFix}>🛠️</Text>
+                            <Text>{`Needs\nFixing!`}</Text>
+                        </TouchableOpacity>
+                    </View>
+                  )
+                })}
+              </ScrollView>
+            </View>
+          )
     };
-
 
     const capitalizeFirstLetter = (string: string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -159,32 +173,36 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                         </>
                     ) : null}
                 </View>
-                <View>
-                    {step === 1 || step === 2 || step === 3 ? (
-                        <>
-                            {renderMachines(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')}
-                        </>
-                    ) : null}
-                </View>
+                {step === 1 || step === 2 || step === 3 ? (
+                    <>
+                        {renderMachines(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')}
+                    </>
+                ) : null}
                 <View>
                     {step === 1 || step === 2 || step === 3 ? (
                         <>
                             <View style={styles.addButtonsBox}>
-                                <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
-                                    <Text>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
-                                <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                                <View style={styles.minusButton}>
+                                    <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                                </View>
+                                    <Text style={styles.machineCounter}>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
+                                <View style={styles.addButton}>
+                                    <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                                </View>    
                             </View>
                         </>
                     ) : null}
                     {step === 1 || step === 2 ? (
                         <>
-                            <View style={styles.nextSubmitButton}>
-                                <Button title="Next" onPress={handleNext} />
-                            </View>
+                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleNext}>
+                                <Text style={styles.nextSubmitText}>Next</Text>
+                            </TouchableOpacity>
                         </>
                     ) : (
                         <>
-                            <Button title="Submit" onPress={() => handleClose()} />
+                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleClose}>
+                                <Text style={styles.nextSubmitText}>Submit</Text>
+                             </TouchableOpacity>
                         </>
                     )}
                 </View>
@@ -218,12 +236,57 @@ const styles = StyleSheet.create({
     mainHeader: {
         fontSize: 25,
         fontWeight: 'bold'
-
     },
     subMainHeader: {
         fontSize: 18,
         fontWeight: '500',
-        paddingTop: 10
+        paddingVertical: 20,
+    },
+    scrollMachines: {
+        flex: 1,
+        backgroundColor: "#faf0e64D",
+        padding: 20,
+    },
+    machineRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        backgroundColor: '#D3D3D34D',
+        borderRadius: 10,
+        margin: 5,
+        padding: 25,
+        gap: 30
+    },
+    machineRowButtonFlex: {
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignItems: 'center'
+    },
+    greenButton: {
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignItems: 'center',
+        backgroundColor: '#5BEB4E66',
+        borderRadius: 10,
+        padding: 10
+    },
+    redButton: {
+        flexDirection: 'column',
+        alignSelf: 'center',
+        alignItems: 'center',
+        backgroundColor: '#EA312A66',
+        borderRadius: 10,
+        padding: 10
+    },
+    machineRowName: {
+        fontSize: 15,
+        fontWeight: 'bold'
+    },
+    machineRowThumbs: {
+        fontSize: 28,
+    },
+    machineRowFix: {
+        fontSize: 28
     },
     addButtonsBox: {
         flexDirection: 'row',
@@ -232,10 +295,30 @@ const styles = StyleSheet.create({
         alignContent: 'flex-end',
         paddingVertical: 30
     },
+    minusButton: {
+        backgroundColor: '#D3D3D359',
+        padding: 10,
+        borderRadius: 20
+    },
+    machineCounter: {
+        fontWeight: 'bold',
+        fontSize: 30,
+    },
+    addButton: {
+        backgroundColor: '#D3D3D359',
+        padding: 10,
+        borderRadius: 20
+    },
     nextSubmitButton: {
-        backgroundColor: 'blue',
+        backgroundColor: '#2B5CFF',
+        padding: 16,
+        alignItems: 'center',
+        borderRadius: 10
+    },
+    nextSubmitText: {
         color: 'white',
-        padding: 10
+        fontSize: 20,
+        fontWeight: '700'
     }
 })
 
