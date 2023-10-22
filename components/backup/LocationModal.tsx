@@ -112,49 +112,51 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
                 </View>
               </View>
             </ImageBackground>
-
             <View style={styles.reviewActions}>
-
+              <Text style={styles.reviewHeader}>Tell us what you saw</Text>
+              { user ? (
+                <>
+                  <View>
+                    <TouchableOpacity style={styles.reportButton} onPress={() => setReportMachinesModalVisible(true)}>
+                      <Text style={styles.reportButtonText}>Report Machines</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ReportMachinesModal
+                    reportMachinesModalVisible={reportMachinesModalVisible}
+                    location={location}
+                    setCurrentLocation={setCurrentLocation}
+                    setReportMachinesModalVisible={setReportMachinesModalVisible} />
+                  {/* <View style={styles.reviewButtonsRow}>
+                    <TouchableOpacity style={styles.thumbsUpButtonBox} onPress={() => handleThumbsUp()}>
+                      <MaterialIcons name='thumb-up' style={styles.thumbsUpButton} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.thumbsDownButtonBox} onPress={() => handleThumbsDown()}>
+                      <MaterialIcons name='thumb-down' style={styles.thumbsDownButton} />
+                    </TouchableOpacity>
+                  </View>
+                  <ThumbsDownModal 
+                    thumbsDownModalVisible={thumbsDownModalVisible} 
+                    location={location}
+                    setCurrentLocation={setCurrentLocation} 
+                    setThumbsdownModalVisible={setThumbsdownModalVisible}/> */}
+                </>
+              )
+              : (
+                <>
+                  <View style={styles.loginPrompt}>
+                    <Button title="Login or Create An Account First to Add Reports" onPress={() => {setLoginModalVisible(true)}} />
+                  </View>
+                  <LoginModal
+                    loginModalVisible={loginModalVisible}
+                    setLoginModalVisible={() => setLoginModalVisible(false)} />
+                </>
+              )}
               <Text style={styles.pastReviewsHeader}>See what others had to say</Text>
-
-              <View style={styles.recentReviewBox}>
-
-
-              </View>
-              
-              
-
-              <View>
-                { user ? (
-                  <>
-                    <View>
-                      <TouchableOpacity style={styles.reportButton} onPress={() => setReportMachinesModalVisible(true)}>
-                        <Text style={styles.reportButtonText}>Report Machines</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <ReportMachinesModal
-                      reportMachinesModalVisible={reportMachinesModalVisible}
-                      location={location}
-                      setCurrentLocation={setCurrentLocation}
-                      setReportMachinesModalVisible={setReportMachinesModalVisible} />
-                  </>
-                )
-                : (
-                  <>
-                    <View style={styles.loginPrompt}>
-                      <Button title="Login or Create An Account First to Add Reports" onPress={() => {setLoginModalVisible(true)}} />
-                    </View>
-                    <LoginModal
-                      loginModalVisible={loginModalVisible}
-                      setLoginModalVisible={() => setLoginModalVisible(false)} />
-                  </>
-                )}
-                <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeMarkerModal()}>
-                  <Text style={styles.looksGoodText}>Looks Good</Text>
-                </TouchableOpacity>
-              </View>
+              <LocationReviewList reviews={currentLocation.reviews} closeMarkerModal={closeMarkerModal}/>
+              <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeMarkerModal()}>
+                <Text style={styles.looksGoodText}>Looks Good</Text>
+              </TouchableOpacity>
             </View>
-
         </View>
       </Modal>
   )
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
       flex: 1,
       flexDirection: 'column',
       justifyContent: 'space-between',
-      height: '55%',
+      height: '65%',
       width: '100%',
       backgroundColor: 'white',
       bottom: 0,
@@ -288,10 +290,12 @@ const styles = StyleSheet.create({
       fontSize: 40,
     },
     pastReviewsHeader: {
-      color: 'black',
-      fontSize: 18,
+      color: 'grey',
+      fontSize: 15,
       fontWeight: '500',
-      paddingBottom: 20
+      paddingTop: 15,
+      paddingLeft: 20,
+      paddingBottom: 10
     },
     looksGoodButton: {
       alignItems: 'center',

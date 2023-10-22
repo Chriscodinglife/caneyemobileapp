@@ -1,18 +1,10 @@
-import { Location } from './Location';
+
+import { machineDB, auth } from '../firebaseConfig';
+import { useAppContext } from './AppContextProvider';
+import { ref, child, update, get } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-
-// Set some types so we can track the status across different machines
-type MachineIndex = number;
-type MachineType = 'glass' | 'can' | 'bottle';
-type MachineStatus = 'thumbsUp' | 'repairNeeded';
-
-// Set the expected types for the machine types
-type MachineData = {
-    glass: { count: number; status: MachineStatus[] };
-    can: { count: number; status: MachineStatus[] };
-    bottle: { count: number; status: MachineStatus[] };
-};
+import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
 
 // Set the types to be expected into this modal as a props
@@ -24,6 +16,7 @@ interface ReportMachinesModalProps {
 }
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
+    const dbRef = ref(machineDB);
     // Set a counter so that we can keep track of which step we are on
     const [step, setStep] = useState(1);
 
@@ -33,6 +26,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         can: { count: 0, status: [] },
         bottle: { count: 0, status: [] },
     });
+
+    const { user, updateUser } = useAppContext();
+    const [currentLocation, setCurrentLocation] = useState(props.location);
 
 
     // Close down this modal when we need to
@@ -60,7 +56,59 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             can: { count: 0, status: [] },
             bottle: { count: 0, status: [] },
         });
-        }
+        };
+    };
+
+    const handleSubmit = () => {
+        // Submit the data up to database
+        console.log(machineData);
+
+        const currentDate = new Date();
+
+        const newReview: Review = {
+            'user': user?.email as string,
+            'date': currentDate.toLocaleDateString(),
+            'machineData': machineData
+        };
+
+        const addReviewToLocation = (location: Location | null | undefined) => {
+        const locationRef = child(dbRef, `machines/${location?.placeID}`);
+
+        get(locationRef).then((snapshot) => {
+
+            if (snapshot.exists()) {
+                const currentLocationData = snapshot.val();
+                console.log(currentLocationData);
+
+            if (!currentLocationData.reviews) {
+                currentLocationData.reviews = [];
+            }
+
+                // Add a new entry to the reviews array for the location
+                currentLocationData.reviews.push(newReview);
+
+                currentLocationData.recentReview = newReview;
+
+                // Update the location locally and in the database
+                props.setCurrentLocation(currentLocationData);
+
+                update(locationRef, currentLocationData)
+                .then(() => {
+                    console.log("New Review Added");
+                })
+                .catch((error) => {
+                    console.error("Error adding review");
+                    alert("There was an error adding the review:" + error.message)
+                });
+                };
+
+        });
+        
+        };
+
+        // Run the function
+        addReviewToLocation(props.location);
+        handleClose();
     };
 
 
@@ -130,7 +178,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             <Text style={styles.machineRowThumbs}>👍</Text>
                             <Text>{`Looks\nGood!`}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={status !== 'thumbsUp' ? styles.redButton : styles.machineRowButtonFlex} onPress={() => handleNeedsRepair(machineType, index)}>
+                        <TouchableOpacity style={status === 'repairNeeded' ? styles.redButton : styles.machineRowButtonFlex} onPress={() => handleNeedsRepair(machineType, index)}>
                             <Text style={styles.machineRowFix}>🛠️</Text>
                             <Text>{`Needs\nFixing!`}</Text>
                         </TouchableOpacity>
@@ -200,7 +248,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                         </>
                     ) : (
                         <>
-                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleClose}>
+                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
                                 <Text style={styles.nextSubmitText}>Submit</Text>
                              </TouchableOpacity>
                         </>

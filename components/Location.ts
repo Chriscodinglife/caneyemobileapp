@@ -1,8 +1,21 @@
+// Set some types so we can track the status across different machines
+export type MachineIndex = number;
+export type MachineType = 'glass' | 'can' | 'bottle';
+export type MachineStatus = 'thumbsUp' | 'repairNeeded';
+
+// Set the expected types for the machine types
+export type MachineData = {
+    glass: { count: number; status: MachineStatus[] };
+    can: { count: number; status: MachineStatus[] };
+    bottle: { count: number; status: MachineStatus[] };
+};
+
 export type Review = {
   user: string;
   date: string;
-  message: string;
+  message?: string;
   imageUri?: string | null;
+  machineData?: MachineData
 }
 
 export type Location = {
@@ -15,6 +28,7 @@ export type Location = {
     address: string;
     placeID: string;
     imageURL?: string;
+    recentReview: Review;
     reviews?: Review[];
 };
 

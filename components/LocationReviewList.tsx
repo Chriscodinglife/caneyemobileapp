@@ -11,11 +11,11 @@ type LocationReviewListProps = {
 
 const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews, closeMarkerModal }) => {
   return (
-    <View style={styles.masterView}>
+    <View style={styles.scrollReviews}>
       <ScrollView>
         { reviews?.map( (review, index) => { 
           return ( 
-            <View key={index} style={styles.listItem}>
+            <View key={index} style={styles.reviewRow}>
               { review.imageUri ? (
                   <>
                   <Image source={{ uri: review.imageUri}} style={styles.imageUriStyle} />
@@ -24,7 +24,6 @@ const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews, closeM
               : (<></>) }
                 <View style={styles.text}>
                   <Text style={styles.date}>{review.date}</Text>
-                  <Text style={styles.message}>{review.message}</Text>
                   <Text style={styles.user}>- {review.user}</Text>
                 </View>
             </View>
@@ -36,19 +35,19 @@ const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews, closeM
 };
 
 const styles = StyleSheet.create({
-    masterView: {
-      flexGrow: 1,
-      flexDirection: 'column',
-      paddingHorizontal: 20
-    },
-    listItem: {
+    scrollReviews: {
       flex: 1,
+      backgroundColor: "#faf0e64D",
+      padding: 20
+    },
+    reviewRow: {
       flexDirection: 'row',
-      height: 75,
-      padding: 15,
-      margin: 10,
+      justifyContent: 'space-evenly',
+      margin: 5,
+      padding: 25,
       backgroundColor: 'white',
-      borderRadius: 5,
+      borderRadius: 10,
+      gap: 30,
       shadowColor: 'black',
       shadowOpacity: 0.2,
       shadowRadius: 4,
