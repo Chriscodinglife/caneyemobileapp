@@ -115,10 +115,35 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
 
             <View style={styles.reviewActions}>
 
-              <Text style={styles.pastReviewsHeader}>See what others had to say</Text>
-
               <View style={styles.recentReviewBox}>
 
+                <Text style={styles.reviewBoxHeader}>🥫 3 out of 4 machines are good</Text>
+
+                <View style={styles.reviewBoxGoodMachinesView}>
+                  
+                  <View style={styles.reviewGlassLeftColumn}>
+                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumberText}>Glass</Text>
+                  </View>
+                  
+                  <View style={styles.reviewCanMiddleColumn}>
+                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumberText}>Can</Text>
+                  </View>
+                  
+                  <View style={styles.reviewBottleRightColumn}>
+                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumberText}>Bottle</Text>
+                  </View>
+
+                </View>
+
+                <View style={styles.reportBoxFooter}>
+                  <Text style={styles.reportBoxDate}>Posted on {location.recentReview.date}</Text>
+                  <TouchableOpacity style={styles.seeMoreReports}>
+                    <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
+                  </TouchableOpacity>
+                </View>
 
               </View>
               
@@ -194,7 +219,7 @@ const styles = StyleSheet.create({
       paddingVertical: 15,
       shadowColor: "white",
       shadowOpacity: 0.2,
-      shadowRadius: 3,
+      shadowRadius: 4,
       shadowOffset: {width: 0, height: 0},
     },
     locationName: {
@@ -218,6 +243,94 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.2,
       shadowRadius: 3,
       shadowOffset: {width: 0, height: 0},
+    },
+    recentReviewBox: {
+      flex: 1,
+      flexDirection: 'column',
+      backgroundColor: 'white',
+      alignItems: 'center',
+      borderRadius: 10,
+      marginBottom: 100,
+      shadowColor: "black",
+      shadowOpacity: 0.3,
+      shadowRadius: 15,
+      shadowOffset: {width: 0, height: 10},
+      padding: 20
+    },
+    reviewBoxHeader: {
+      alignSelf: 'flex-start',
+      fontSize: 17,
+      fontWeight: '600'
+    },
+    reviewBoxGoodMachinesView: {
+      flex: 3,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      alignItems: 'center',
+      padding: 10,
+      margin: 10,
+      backgroundColor: '#F6F5F1',
+      borderRadius: 20
+    },
+    reportNumber: {
+      fontWeight: 'bold',
+      fontSize: 30,
+    },
+    reportNumberText: {
+      fontSize: 17,
+      fontWeight: '600'
+    },
+    reviewGlassLeftColumn: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      gap: 30,
+      height: '100%',
+      borderRightColor: 'grey',
+      borderRightWidth: 1,
+      padding: 20,
+    },
+    reviewCanMiddleColumn: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      gap: 30,
+      height: '100%',
+      borderRightColor: 'grey',
+      borderRightWidth: 1,
+      padding: 20
+    },
+    reviewBottleRightColumn: {
+      flex: 1, 
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      gap: 30,
+      height: '100%',
+      borderRightColor: 'grey',
+      padding: 20
+    },
+    reportBoxFooter: {
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      width: '100%'
+    },
+    reportBoxDate: {
+      fontSize: 13
+    },
+    seeMoreReports: {
+      alignSelf: 'flex-end',
+      backgroundColor: '#1636EA',
+      borderRadius: 5,
+      padding: 4,
+      paddingHorizontal: 6
+    },
+    seeMoreReportsText: {
+      color: 'white',
+      fontWeight: '600',
+      fontSize: 15
     },
     reportButton: {
       alignItems: 'center',

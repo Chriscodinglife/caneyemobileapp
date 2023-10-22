@@ -2,14 +2,14 @@ import React from 'react';
 import { Review } from './Location';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button} from 'react-native';
 
-type LocationReportListModalProps = {
+type LocationReviewListProps = {
     reviews?: Review[];
     closeMarkerModal: () => void;
 }
 
 
 
-const LocationReportListModal: React.FC<LocationReportListModalProps> = ({ reviews, closeMarkerModal }) => {
+const LocationReviewList: React.FC<LocationReviewListProps> = ({ reviews, closeMarkerModal }) => {
   return (
     <View style={styles.scrollReviews}>
       <ScrollView>
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
     },
   });
 
-export default LocationReportListModal
+export default LocationReviewList
