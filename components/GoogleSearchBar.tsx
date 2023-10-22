@@ -11,7 +11,7 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openNewLocationModal 
 
     return (
         <GooglePlacesAutocomplete
-          placeholder="Where do you want to recycle?"
+          placeholder="Search and Add a Location"
           onPress={(data, details = null) => {
             const newLocation: Location = {
               "name" : details?.name as string,

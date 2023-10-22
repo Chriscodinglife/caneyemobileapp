@@ -118,10 +118,8 @@ export default function App() {
             longitudeDelta: 0.1}}>
               <LocationMarkers locations={locations}/> 
         </MapView>
-        <View style={styles.addButtonContainer}>
-          <AddButton onClick={addButtonClickHandler}/>
-        </View>
-          <LocationListModal locations={locations} closeListModal={closeListModal} isLocationListVisible={isLocationListVisible}/>
+        <AddButton onClick={addButtonClickHandler}/>
+        <LocationListModal locations={locations} closeListModal={closeListModal} isLocationListVisible={isLocationListVisible}/>
         <StatusBar style="auto" />
       </View>
     </AppContextProvider>
@@ -133,10 +131,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center'
-  },
-  addButtonContainer : {
-    position: 'absolute',
-    bottom: 80
   },
   map: {
     width: '100%',

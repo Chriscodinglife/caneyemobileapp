@@ -49,7 +49,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         if (step < 3) {
             if (!isSelectionMade) {
                 // Check if a selection has been made, show an alert if not
-                Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+                Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
                 return;
             }
             setStep(step + 1);
@@ -59,7 +59,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         // Reset the step and data for the next report
             if (!isSelectionMade) {
                 // Check if a selection has been made, show an alert if not
-                Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+                Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
                 return;
             }
             setStep(1);
@@ -78,7 +78,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
         if (!isSelectionMade) {
             // Check if a selection has been made, show an alert if not
-            Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+            Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
             return;
         }
 

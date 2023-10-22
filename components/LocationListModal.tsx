@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import LocationModal from './LocationModal';
+import { Location, MachineStatus } from './Location';
 import { useAppContext } from './AppContextProvider';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TouchableHighlight, Modal } from 'react-native';
 
@@ -31,95 +32,184 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
       transparent={true}
       visible={isLocationListVisible}
       onRequestClose={() => closeListModal()}>
-      <View style={styles.locationListModalContainer}>
-        <View style={styles.locationListModalContent}>
+
+      <View style={styles.mainView}>
+
+          <View style={styles.headerBox}>
             <TouchableOpacity onPress={() => closeListModal()}>
                 <Text style={styles.closeButtonText}>{`<-`}</Text>
             </TouchableOpacity>
-          <Text style={styles.locationListSubHeader}>What's in your area</Text>
-          <Text style={styles.locationListHeader}>Local Recycle Machines</Text>
-          <ScrollView>
-            { locations.map( (location, index) => { 
-              return (
-                <TouchableOpacity key={index} style={styles.listItem} onPress={() => openMarkerModal(index)}>
-                  <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
-                  <View style={styles.locationDetails}>
-                    <Text style={styles.locationName}>{location.name}</Text>
-                    <Text style={styles.locationAddress}>{location.address}</Text>
+            
+            <Text style={styles.mainHeader}>Local Recycle Machines</Text>
+            <Text style={styles.subMainHeader}>What's in your area</Text>
+          </View>
+
+          <View style={styles.scrollLocations}>
+            <ScrollView>
+              { locations.map( (location, index) => { 
+
+                const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+                const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+                const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+
+                const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
+                const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
+                const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
+
+
+                const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
+                const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
+                return (
+                  <View key={index} style={styles.locationItem}>
+                    <TouchableOpacity style={styles.locationContent} onPress={() => openMarkerModal(index)}>
+                      <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
+                      <View style={styles.locationDetails}>
+                        <Text style={styles.locationName}>{location.name}</Text>
+                        <Text style={styles.locationAddress}>{location.address}</Text>
+                        <Text style={styles.locationStatus}>{`🥫 ${goodMachinesCount}`} machines</Text>
+                      </View>
+                      <LocationModal 
+                        selectedLocationIndex={selectedLocationIndex}
+                        closeMarkerModal={() => closeMarkerModal()}
+                        location={location}
+                        index={index}/>
+                    </TouchableOpacity>
                   </View>
-                  <LocationModal 
-                    selectedLocationIndex={selectedLocationIndex}
-                    closeMarkerModal={() => closeMarkerModal()}
-                    location={location}
-                    index={index}/>
-                </TouchableOpacity>
-              )
-            })}
-          </ScrollView>
+                )
+              })}
+              <TouchableOpacity style={styles.searchNewButton}onPress={() => closeListModal()}>
+                <Text style={styles.searchNewText}>{`Don't see a location?\nSearch for one and add it!`}</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+
+          <View>
+            <TouchableOpacity style={styles.closeButton} onPress={() => closeListModal()}>
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+
         </View>
-      </View>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  locationListModalContainer: {
+  mainView: {
     flex: 1,
-    justifyContent: 'flex-end'
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 30
+  },
+  headerBox: {
+    alignItems: 'flex-start',
+    paddingTop: 20,
+  },
+  mainHeader: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  subMainHeader: {
+    fontSize: 18,
+    fontWeight: '500',
   },
   closeButtonText: {
     color: 'grey',
     fontWeight: "bold",
     fontSize: 20,
-    backgroundColor: 'white'
-  },
-  locationListModalContent: {
     backgroundColor: 'white',
-    marginTop: 30,
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: '80%'
+    paddingVertical: 30
   },
-  locationListSubHeader: {
-    paddingTop: 30,
-    color: 'grey',
-    fontSize: 10
+  scrollLocations: {
+    flex: 1,
+    backgroundColor: "#faf0e64D",
+    padding: 10,
+    marginVertical: 10
   },
-  locationListHeader: {
-    paddingBottom: 30,
-    fontWeight: '600',
-    fontSize: 20,
-    color: '#636661'
-  },
-  listItem: {
+  locationItem: {
     flex: 1,
     flexDirection: 'row',
-    padding: 1,
-    margin: 1,
-    height: 150,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    margin: 5,
+    padding: 10,
+    gap: 40,
+    shadowColor: 'grey',
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    shadowOffset: { height: 10, width: 0},
+    
+  },
+  locationContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    width: '100%',
+    height: '100%',
+    padding: 8,
   },
   locationImage: {
-    height: '50%',
+    alignSelf: 'center',
+    height: '100%',
     width: '50%',
-    borderRadius: 15
+    borderRadius: 5
   },
   locationDetails: {
     flex: 1,
     flexDirection: 'column',
-    paddingLeft: 20,
-    paddingTop: 15,
-    alignContent: 'center',
+    justifyContent: 'space-between',
+    gap: 20,
+    alignItems: 'flex-end',
+    padding: 10
   },
   locationName: {
     fontWeight: 'bold',
     fontSize: 15,
   },
   locationAddress: {
-    fontSize: 10,
-    paddingTop: 5,
-    color: 'grey'
-  }
+    fontSize: 14,
+    textAlign: 'right',
+  },
+  locationStatus: {
+    fontSize: 18,
+    fontWeight: '700'
+  },
+  searchNewButton: {
+    marginVertical: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: "#EA8402",
+    borderRadius: 10,
+    padding: 14,
+    shadowColor: "#00AEED",
+  },
+  searchNewText: {
+    alignSelf: 'center',
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  closeButton: {
+    alignItems: 'center',
+    backgroundColor: "#1EB2EB",
+    borderRadius: 10,
+    padding: 16,
+    shadowColor: "#00AEED",
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
+  },
+  closeText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '700',
+  },
 });
 
 export default LocationListModal;

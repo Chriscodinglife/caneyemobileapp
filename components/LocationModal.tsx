@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     seeMoreReportsText: {
       color: 'white',
       fontWeight: '600',
-      fontSize: 15
+      fontSize: 13
     },
     reportButton: {
       alignItems: 'center',
