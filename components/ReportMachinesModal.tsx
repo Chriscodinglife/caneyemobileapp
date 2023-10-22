@@ -3,7 +3,7 @@ import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
 import { ref, child, update, get } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
 
@@ -29,6 +29,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     const { user, updateUser } = useAppContext();
     const [currentLocation, setCurrentLocation] = useState(props.location);
+    const [isSelectionMade, setIsSelectionMade] = useState(false);
 
 
     // Close down this modal when we need to
@@ -46,22 +47,40 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
         if (step < 3) {
-        setStep(step + 1);
+            if (!isSelectionMade) {
+                // Check if a selection has been made, show an alert if not
+                Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+                return;
+            }
+            setStep(step + 1);
+            setIsSelectionMade(false);
         } else {
         // Save the report data to your database or perform further processing
         // Reset the step and data for the next report
-        setStep(1);
-        setMachineData({
-            glass: { count: 0, status: [] },
-            can: { count: 0, status: [] },
-            bottle: { count: 0, status: [] },
-        });
+            if (!isSelectionMade) {
+                // Check if a selection has been made, show an alert if not
+                Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+                return;
+            }
+            setStep(1);
+            setIsSelectionMade(false);
+            setMachineData({
+                glass: { count: 0, status: [] },
+                can: { count: 0, status: [] },
+                bottle: { count: 0, status: [] },
+            });
         };
     };
 
     const handleSubmit = () => {
         // Submit the data up to database
         console.log(machineData);
+
+        if (!isSelectionMade) {
+            // Check if a selection has been made, show an alert if not
+            Alert.alert('Selection Required', 'After adding a machine, make sure to select either "👍 Looks Good!" or "🛠️ Needs Fixing!"');
+            return;
+        }
 
         const currentDate = new Date();
 
@@ -123,6 +142,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         ...machineData,
         [machineType]: currentMachineData,
         });
+
+        setIsSelectionMade(true);
     };
 
     // Set the status for a current given machine that needs repair
@@ -137,6 +158,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         ...machineData,
         [machineType]: currentMachineData,
         });
+
+        setIsSelectionMade(true);
     };
 
 

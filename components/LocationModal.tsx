@@ -1,13 +1,13 @@
 import LoginModal from './LoginModal';
-import { Location, Review } from './Location';
+import { Location, MachineData, Review, MachineStatus } from './Location';
 import ThumbsDownModal from './thumbsDownModal';
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
-import LocationReviewList from './LocationReviewList';
 import { ref, child, update, get } from 'firebase/database';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import LocationReportListModal from './LocationReportListModal';
 import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import ReportMachinesModal from './ReportMachinesModal';
 
@@ -25,7 +25,20 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
   const [currentLocation, setCurrentLocation] = useState(location);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [thumbsDownModalVisible, setThumbsdownModalVisible] = useState(false);
+  const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false)
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
+
+  const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+  const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+  const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+
+  const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
+  const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
+  const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
+
+
+  const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
+  const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
 
   const handleThumbsUp = () => {
 
@@ -117,38 +130,35 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
 
               <View style={styles.recentReviewBox}>
 
-                <Text style={styles.reviewBoxHeader}>🥫 3 out of 4 machines are good</Text>
+                <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
 
                 <View style={styles.reviewBoxGoodMachinesView}>
                   
                   <View style={styles.reviewGlassLeftColumn}>
-                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumber}>{goodGlassMachines}</Text>
                     <Text style={styles.reportNumberText}>Glass</Text>
                   </View>
                   
                   <View style={styles.reviewCanMiddleColumn}>
-                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumber}>{goodCanMachines}</Text>
                     <Text style={styles.reportNumberText}>Can</Text>
                   </View>
                   
                   <View style={styles.reviewBottleRightColumn}>
-                    <Text style={styles.reportNumber}>1</Text>
+                    <Text style={styles.reportNumber}>{goodBottleMachines}</Text>
                     <Text style={styles.reportNumberText}>Bottle</Text>
                   </View>
 
                 </View>
 
                 <View style={styles.reportBoxFooter}>
-                  <Text style={styles.reportBoxDate}>Posted on {location.recentReview.date}</Text>
-                  <TouchableOpacity style={styles.seeMoreReports}>
+                  <Text style={styles.reportBoxDate}>Posted on {location.recentReview?.date}</Text>
+                  <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
                     <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
                   </TouchableOpacity>
                 </View>
 
               </View>
-              
-              
-
               <View>
                 { user ? (
                   <>
@@ -181,6 +191,11 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
             </View>
 
         </View>
+        <LocationReportListModal 
+          location={location}
+          reviews={location.reviews}
+          isLocationReportListModalVisible={locationReportListModalVisible}
+          closeLocationReportListModal={setLocationReportListModalVisible}/>
       </Modal>
   )
 }
