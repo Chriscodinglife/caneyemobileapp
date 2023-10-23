@@ -28,7 +28,7 @@ export type Location = {
     address: string;
     placeID: string;
     imageURL?: string;
-    recentReview: Review;
+    recentReview?: Review;
     reviews?: Review[];
 };
 
