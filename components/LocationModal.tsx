@@ -176,9 +176,9 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
                 )
                 : (
                   <>
-                    <View style={styles.loginPrompt}>
-                      <Button title="Login or Create An Account First to Add Reports" onPress={() => {setLoginModalVisible(true)}} />
-                    </View>
+                    <TouchableOpacity style={styles.loginPromptButton} onPress={() => setLoginModalVisible(true)}>
+                      <Text style={styles.loginPromptText}>Login or Create An Account First to Add Reports</Text>
+                      </TouchableOpacity>
                     <LoginModal
                       loginModalVisible={loginModalVisible}
                       setLoginModalVisible={() => setLoginModalVisible(false)} />
@@ -247,7 +247,8 @@ const styles = StyleSheet.create({
       shadowOffset: {width: 0, height: 0},
     },
     locationAddressBar: {
-      flexDirection: 'row'
+      flexDirection: 'row',
+      paddingRight: 20
     },
     locationAddress: {
       paddingVertical: 10,
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.3,
       shadowRadius: 15,
       shadowOffset: {width: 0, height: 10},
-      padding: 20
+      padding: 15
     },
     reviewBoxHeader: {
       alignSelf: 'flex-start',
@@ -282,6 +283,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       width: '100%',
+      height: '130%',
       alignItems: 'center',
       padding: 10,
       margin: 10,
@@ -304,7 +306,7 @@ const styles = StyleSheet.create({
       height: '100%',
       borderRightColor: 'grey',
       borderRightWidth: 1,
-      padding: 20,
+      padding: 15,
     },
     reviewCanMiddleColumn: {
       flex: 1,
@@ -314,7 +316,7 @@ const styles = StyleSheet.create({
       height: '100%',
       borderRightColor: 'grey',
       borderRightWidth: 1,
-      padding: 20
+      padding: 15
     },
     reviewBottleRightColumn: {
       flex: 1, 
@@ -323,7 +325,7 @@ const styles = StyleSheet.create({
       gap: 30,
       height: '100%',
       borderRightColor: 'grey',
-      padding: 20
+      padding: 15
     },
     reportBoxFooter: {
       flex: 1,
@@ -367,7 +369,7 @@ const styles = StyleSheet.create({
       flex: 1,
       flexDirection: 'column',
       justifyContent: 'space-between',
-      height: '55%',
+      height: '65%',
       width: '100%',
       backgroundColor: 'white',
       bottom: 0,
@@ -436,8 +438,22 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: '700',
     },
-    loginPrompt: {
-      paddingVertical: 20
+    loginPromptButton: {
+      alignItems: 'center',
+      backgroundColor: "#3C85EB",
+      borderRadius: 10,
+      padding: 16,
+      marginVertical: 10,
+      shadowColor: "#3C85EB",
+      shadowOpacity: 0.5,
+      shadowRadius: 4,
+      shadowOffset: {width: 0, height: 2},
+    },
+    loginPromptText: {
+      color: 'white',
+      fontSize: 15,
+      fontWeight: '600',
+      textAlign: 'center'
     }
 });
 
