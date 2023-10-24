@@ -12,13 +12,13 @@ import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBa
 import ReportMachinesModal from './ReportMachinesModal';
 
 type LocationModalProps = {
-  index: number;
+  index: number | null;
   location: Location;
-  closeMarkerModal: () => void;
+  closeLocationModal: () => void;
   selectedLocationIndex: number | null;
 }
 
-const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModal, selectedLocationIndex, index}) => {
+const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationModal, selectedLocationIndex, index}) => {
   
   const dbRef = ref(machineDB);
   const { user, updateUser } = useAppContext();
@@ -107,13 +107,13 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
         animationType='slide'
         transparent={false}
         visible={selectedLocationIndex === index} // Check if this marker is selected
-        onRequestClose={() => closeMarkerModal()}
+        onRequestClose={() => closeLocationModal()}
       >
         <View style={styles.mainView}>
             <ImageBackground source={{ uri: location.imageURL}} style={styles.locationImage}>
               <View style={styles.locationMainBlackBoxHeader}>
                 <View style={styles.locationHeaderBox}>
-                <TouchableOpacity onPress={() => closeMarkerModal()}>
+                <TouchableOpacity onPress={() => closeLocationModal()}>
                     <Text style={styles.closeButtonText}>{`<-`}</Text>
                 </TouchableOpacity>
                   <Text style={styles.locationNameSubHeader}>What's recycling at</Text>
@@ -184,7 +184,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeMarkerModa
                       setLoginModalVisible={() => setLoginModalVisible(false)} />
                   </>
                 )}
-                <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeMarkerModal()}>
+                <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeLocationModal()}>
                   <Text style={styles.looksGoodText}>Looks Good</Text>
                 </TouchableOpacity>
               </View>
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       justifyContent: 'space-around',
-      gap: 30,
+      gap: 20,
       height: '100%',
       borderRightColor: 'grey',
       borderRightWidth: 1,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       justifyContent: 'space-around',
-      gap: 30,
+      gap: 20,
       height: '100%',
       borderRightColor: 'grey',
       borderRightWidth: 1,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
       flex: 1, 
       alignItems: 'center',
       justifyContent: 'space-around',
-      gap: 30,
+      gap: 20,
       height: '100%',
       borderRightColor: 'grey',
       padding: 15

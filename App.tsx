@@ -11,6 +11,7 @@ import NewLocationModal from './components/newLocationModal';
 import { AppContextProvider } from './components/AppContextProvider';
 import { Location, PlaceDetailsResponse, apiKey } from './components/Location';
 import { StyleSheet, Text, View, Modal, TouchableHighlight } from 'react-native';
+import LocationModal from './components/LocationModal';
 
 
 export default function App() {
@@ -31,8 +32,9 @@ export default function App() {
   const dbRef = ref(machineDB);
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLocationListVisible, setLocationListVisible] = useState(false);
-  const [newLocation, setNewLocation] = useState<Location>(blankLocation);
-  const [newLocationModalVisible, setNewLocationModalVisible] = useState(false);
+  const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
+  const [thisLocation, setThisLocation] = useState<Location>(blankLocation);
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
 
   // Get the data from the database to list out to the map
@@ -82,15 +84,17 @@ export default function App() {
   };
 
   
-  const openNewLocationModal = (location: Location) => {
-    setNewLocation(location)
-    setNewLocationModalVisible(true)
+  const openLocationModal = (location: Location, index: number) => {
+    setThisLocation(location);
+    setSelectedLocationIndex(index);
+    setLocationModalVisible(true);
   }
 
 
-  const closeNewLocationModal = () => {
-    setNewLocation(blankLocation)
-    setNewLocationModalVisible(false)
+  const closeLocationModal = () => {
+    setThisLocation(blankLocation);
+    setLocationModalVisible(false);
+    setSelectedLocationIndex(null);
   }
 
   // Return back the MapView with the locations and a button to add
@@ -98,15 +102,21 @@ export default function App() {
     <AppContextProvider>
       <View style={styles.mapContainer}>
         <GoogleSearchBar
-          openNewLocationModal={openNewLocationModal}
+          openLocationModal={openLocationModal}
         />
-        <NewLocationModal
-          newLocationModalVisible={newLocationModalVisible}
-          closeNewLocationModal={() => closeNewLocationModal()}
-          location={newLocation}
+        <LocationModal
+          selectedLocationIndex={selectedLocationIndex}
+          closeLocationModal={() => closeLocationModal()}
+          location={thisLocation}
+          index={1}
+        />
+        {/* <NewLocationModal
+          newLocationModalVisible={locationModalVisible}
+          closeNewLocationModal={() => closeLocationModal()}
+          location={thisLocation}
           locations={locations}
-          setLocations={() => setLocations(previousLocations => [...previousLocations, newLocation])}
-          />
+          setLocations={() => setLocations(previousLocations => [...previousLocations, thisLocation])}
+          /> */}
         <MapView 
           provider='google' 
           style={styles.map}

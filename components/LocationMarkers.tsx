@@ -12,12 +12,12 @@ const LocationMarkers: React.FC<LocationMarkersProps> = ({ locations }) => {
   const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
 
 
-  const openMarkerModal = (index: number) => {
+  const openLocationModal = (index: number) => {
     setSelectedLocationIndex(index);
   }
 
 
-  const closeMarkerModal = () => {
+  const closeLocationModal = () => {
     setSelectedLocationIndex(null);
   }
 
@@ -29,12 +29,12 @@ const LocationMarkers: React.FC<LocationMarkersProps> = ({ locations }) => {
           coordinate={location.location}
           style={styles.marker}
           title={location.name}
-          onPress={() => openMarkerModal(index)} // Pass the index to openMarkerModal
+          onPress={() => openLocationModal(index)} // Pass the index to openMarkerModal
         >
         </Marker>
         <LocationModal 
           selectedLocationIndex={selectedLocationIndex}
-          closeMarkerModal={() => closeMarkerModal()}
+          closeLocationModal={() => closeLocationModal()}
           location={location}
           index={index}/>
       </View>

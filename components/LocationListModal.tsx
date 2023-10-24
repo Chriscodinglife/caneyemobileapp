@@ -16,12 +16,12 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
   const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
 
 
-  const openMarkerModal = (index: number) => {
+  const openLocationModal = (index: number) => {
     setSelectedLocationIndex(index);
   }
 
 
-  const closeMarkerModal = () => {
+  const closeLocationModal = () => {
     setSelectedLocationIndex(null);
   }
 
@@ -61,7 +61,7 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
                 const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
                 return (
                   <View key={index} style={styles.locationItem}>
-                    <TouchableOpacity style={styles.locationContent} onPress={() => openMarkerModal(index)}>
+                    <TouchableOpacity style={styles.locationContent} onPress={() => openLocationModal(index)}>
                       <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
                       <View style={styles.locationDetails}>
                         <Text style={styles.locationName}>{location.name}</Text>
@@ -70,7 +70,7 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
                       </View>
                       <LocationModal 
                         selectedLocationIndex={selectedLocationIndex}
-                        closeMarkerModal={() => closeMarkerModal()}
+                        closeLocationModal={() => closeLocationModal()}
                         location={location}
                         index={index}/>
                     </TouchableOpacity>
