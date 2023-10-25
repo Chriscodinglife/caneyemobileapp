@@ -91,7 +91,7 @@ const NewLocationModal: React.FC<NewLocationModalProps> = ({ location, closeNewL
             }} />
           <LoginModal
             loginModalVisible={loginModalVisible}
-            setLoginModalVisible={() => setLoginModalVisible(false)} />
+            setLoginModalVisible={setLoginModalVisible} />
             </>
         )}
         

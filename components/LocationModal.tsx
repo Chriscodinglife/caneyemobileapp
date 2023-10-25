@@ -10,6 +10,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LocationReportListModal from './LocationReportListModal';
 import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import ReportMachinesModal from './ReportMachinesModal';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
 type LocationModalProps = {
   index: number | null;
@@ -36,54 +37,11 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
   const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
   const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
 
+  const numberOfReports = location.reviews?.length ?? 0
+
 
   const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
   const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
-
-  const handleThumbsUp = () => {
-
-    const currentDate = new Date();
-
-    const newReview: Review = {
-      'user': user?.email as string,
-      'date': currentDate.toLocaleDateString(),
-      'message': "This place looks good!"
-    }
-
-    const addReviewToLocation = (location: Location | null | undefined) => {
-      const locationRef = child(dbRef, `machines/${location?.placeID}`);
-
-      get(locationRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const currentLocationData = snapshot.val();
-          console.log(currentLocationData)
-
-          if (!currentLocationData.reviews) {
-            currentLocationData.reviews = [];
-          }
-
-          currentLocationData.reviews.push(newReview);
-
-          // Update the location locally and in the database
-          setCurrentLocation(currentLocationData)
-          update(locationRef, currentLocationData)
-          .then(() => {
-            console.log("New Review Added");
-          })
-          .catch((error) => {
-            console.error("Error adding review");
-            alert("There was an error adding the review:" + error.message)
-          });
-        };
-
-      });
-      
-    };
-
-    // Run the function
-    addReviewToLocation(location);
-
-  };
 
   // Listen to state changes of the user and pass that along as needed
   useEffect(() => {
@@ -96,11 +54,8 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
   // Listen for changes in the location prop
   useEffect(() => {
     setCurrentLocation(location);
-  }, [location]);
+  }, [currentLocation]);
 
-  const handleThumbsDown = () => {
-    setThumbsdownModalVisible(true)
-  };
 
   return (
       <Modal
@@ -110,7 +65,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
         onRequestClose={() => closeLocationModal()}
       >
         <View style={styles.mainView}>
-            <ImageBackground source={{ uri: location.imageURL}} style={styles.locationImage}>
+            <ImageBackground source={{ uri: currentLocation.imageURL}} style={styles.locationImage}>
               <View style={styles.locationMainBlackBoxHeader}>
                 <View style={styles.locationHeaderBox}>
                 <TouchableOpacity onPress={() => closeLocationModal()}>
@@ -128,7 +83,8 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
 
             <View style={styles.reviewActions}>
 
-              <View style={styles.recentReviewBox}>
+              { numberOfReports > 0 ? ( 
+                <View style={styles.recentReviewBox}>
 
                 <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
 
@@ -152,13 +108,36 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                 </View>
 
                 <View style={styles.reportBoxFooter}>
-                  <Text style={styles.reportBoxDate}>Posted on {location.recentReview?.date}</Text>
+                  <Text style={styles.reportBoxDate}>Posted on {currentLocation.recentReview?.date}</Text>
                   <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
                     <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
                   </TouchableOpacity>
                 </View>
 
               </View>
+
+              ) : ( 
+                <>
+                {user ? (
+                  <View style={styles.recentReviewBox}>
+                    <TouchableOpacity style={styles.noReviewsContainer} onPress={() => setReportMachinesModalVisible(true)}>
+                      <MaterialCommunityIcons name="alert-decagram" size={60} color="red" />
+                      <Text style={styles.noReviewsText}>{`No reports have been submitted for this location.\n\nAdd one today!`}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={styles.recentReviewBox}>
+                    <TouchableOpacity style={styles.noReviewsContainer} onPress={() => setLoginModalVisible(true)}>
+                      <MaterialCommunityIcons name="alert-decagram" size={60} color="red" />
+                      <Text style={styles.noReviewsText}>{`No reports have been submitted for this location.\n\nLogin and add one!`}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                </>
+
+              )}
+              
+
               <View>
                 { user ? (
                   <>
@@ -169,7 +148,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                     </View>
                     <ReportMachinesModal
                       reportMachinesModalVisible={reportMachinesModalVisible}
-                      location={location}
+                      location={currentLocation}
                       setCurrentLocation={setCurrentLocation}
                       setReportMachinesModalVisible={setReportMachinesModalVisible} />
                   </>
@@ -177,11 +156,11 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                 : (
                   <>
                     <TouchableOpacity style={styles.loginPromptButton} onPress={() => setLoginModalVisible(true)}>
-                      <Text style={styles.loginPromptText}>Login or Create An Account First to Add Reports</Text>
+                      <Text style={styles.loginPromptText}>Login to add a Report</Text>
                       </TouchableOpacity>
                     <LoginModal
                       loginModalVisible={loginModalVisible}
-                      setLoginModalVisible={() => setLoginModalVisible(false)} />
+                      setLoginModalVisible={setLoginModalVisible} />
                   </>
                 )}
                 <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeLocationModal()}>
@@ -192,8 +171,8 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
 
         </View>
         <LocationReportListModal 
-          location={location}
-          reviews={location.reviews}
+          location={currentLocation}
+          reviews={currentLocation.reviews}
           isLocationReportListModalVisible={locationReportListModalVisible}
           closeLocationReportListModal={setLocationReportListModalVisible}/>
       </Modal>
@@ -225,7 +204,7 @@ const styles = StyleSheet.create({
       backgroundColor: '#00000080',
       paddingLeft: 20,
       paddingVertical: 15,
-      paddingBottom: 40,
+      paddingBottom: 20,
     },
     locationNameSubHeader: {
       color: 'white',
@@ -440,20 +419,32 @@ const styles = StyleSheet.create({
     },
     loginPromptButton: {
       alignItems: 'center',
-      backgroundColor: "#3C85EB",
+      backgroundColor: "#F05942",
       borderRadius: 10,
       padding: 16,
       marginVertical: 10,
-      shadowColor: "#3C85EB",
+      shadowColor: "#F05942",
       shadowOpacity: 0.5,
       shadowRadius: 4,
       shadowOffset: {width: 0, height: 2},
     },
     loginPromptText: {
       color: 'white',
-      fontSize: 15,
+      fontSize: 20,
       fontWeight: '600',
       textAlign: 'center'
+    },
+    noReviewsContainer: {
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'space-evenly',
+      alignContent: 'center',
+      alignItems: 'center'
+    },
+    noReviewsText: {
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: 'bold'
     }
 });
 

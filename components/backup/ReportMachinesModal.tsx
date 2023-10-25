@@ -1,7 +1,7 @@
 
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
-import { ref, child, update, get, set } from 'firebase/database';
+import { ref, child, update, get } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
@@ -28,6 +28,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     });
 
     const { user, updateUser } = useAppContext();
+    const [currentLocation, setCurrentLocation] = useState(props.location);
+    const [isSelectionMade, setIsSelectionMade] = useState(false);
+
 
     // Close down this modal when we need to
     const handleClose = () => {
@@ -44,52 +47,36 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
         if (step < 3) {
-            let giveMachineType = ""
-            if (step == 1) {
-                giveMachineType = "glass"
-            } else if (step == 2) {
-                giveMachineType = "can"
-            } else {
-                giveMachineType = "bottle"
-            }
-
-            const count = (machineData as MachineData)[giveMachineType as MachineType].count;
-            const countStatus = (machineData as MachineData)[giveMachineType as MachineType].status.length;
-
-            if (count != countStatus) {
+            if (!isSelectionMade) {
                 // Check if a selection has been made, show an alert if not
                 Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
                 return;
             }
             setStep(step + 1);
-        } 
-            // else {
-            // // Save the report data to your database or perform further processing
-            // // Reset the step and data for the next report
-            //     if (!isSelectionMade) {
-            //         // Check if a selection has been made, show an alert if not
-            //         Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
-            //         return;
-            //     }
-            //     setStep(1);
-            //     setIsSelectionMade(false);
-            //     setMachineData({
-            //         glass: { count: 0, status: [] },
-            //         can: { count: 0, status: [] },
-            //         bottle: { count: 0, status: [] },
-            //     });
-            // };
+            setIsSelectionMade(false);
+        } else {
+        // Save the report data to your database or perform further processing
+        // Reset the step and data for the next report
+            if (!isSelectionMade) {
+                // Check if a selection has been made, show an alert if not
+                Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
+                return;
+            }
+            setStep(1);
+            setIsSelectionMade(false);
+            setMachineData({
+                glass: { count: 0, status: [] },
+                can: { count: 0, status: [] },
+                bottle: { count: 0, status: [] },
+            });
+        };
     };
 
     const handleSubmit = () => {
         // Submit the data up to database
+        console.log(machineData);
 
-        const giveMachineType = "bottle"
-
-        const count = (machineData as MachineData)[giveMachineType as MachineType].count;
-            const countStatus = (machineData as MachineData)[giveMachineType as MachineType].status.length;
-
-        if (count != countStatus) {
+        if (!isSelectionMade) {
             // Check if a selection has been made, show an alert if not
             Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
             return;
@@ -104,73 +91,43 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         };
 
         const addReviewToLocation = (location: Location | null | undefined) => {
+        const locationRef = child(dbRef, `machines/${location?.placeID}`);
 
-            if (!location) {
-                console.error("Location is null or undefined");
-                return;
+        get(locationRef).then((snapshot) => {
+
+            if (snapshot.exists()) {
+                const currentLocationData = snapshot.val();
+                console.log(currentLocationData);
+
+            if (!currentLocationData.reviews) {
+                currentLocationData.reviews = [];
             }
 
-            const locationRef = child(dbRef, `machines/${location?.placeID}`);
+                // Add a new entry to the reviews array for the location
+                currentLocationData.reviews.push(newReview);
 
-            get(locationRef).then((snapshot) => {
+                currentLocationData.recentReview = newReview;
 
-                if (snapshot.exists()) {
-                    const currentLocationData = snapshot.val();
+                // Update the location locally and in the database
+                props.setCurrentLocation(currentLocationData);
 
-                    if (!currentLocationData.reviews) {
-                        currentLocationData.reviews = [];
-                    }
-
-                    // Add a new entry to the reviews array for the location
-                    currentLocationData.reviews.push(newReview);
-
-                    currentLocationData.recentReview = newReview;
-
-                    // Update the location locally and in the database
-                    props.setCurrentLocation(currentLocationData);
-
-                    update(locationRef, currentLocationData)
-                    .then(() => {
-                        console.log("New Review Added");
-                    })
-                    .catch((error) => {
-                        console.error("Error adding review");
-                        alert("There was an error adding the review:" + error.message)
-                    });
-                } else {
-
-                    const currentLocationData = location;
-
-                    if (!currentLocationData?.reviews) {
-                        currentLocationData.reviews = [];
-                    }
-
-                    // Add a new entry to the reviews array for the location
-                    currentLocationData.reviews.push(newReview);
-
-                    currentLocationData.recentReview = newReview;
-
-                    // Update the location locally and in the database
-                    props.setCurrentLocation(currentLocationData);
-
-                    set(locationRef, currentLocationData)
-                    .then(() => {
-                        console.log("New Review Added with New Location");
-                    })
-                    .catch((error) => {
-                        console.error("Error adding review");
-                        alert("There was an error adding the review with the location:" + error.message)
-                    });
+                update(locationRef, currentLocationData)
+                .then(() => {
+                    console.log("New Review Added");
+                })
+                .catch((error) => {
+                    console.error("Error adding review");
+                    alert("There was an error adding the review:" + error.message)
+                });
                 };
 
-            });
-            
+        });
+        
         };
 
         // Run the function
         addReviewToLocation(props.location);
         handleClose();
-        
     };
 
 
@@ -186,6 +143,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         [machineType]: currentMachineData,
         });
 
+        setIsSelectionMade(true);
     };
 
     // Set the status for a current given machine that needs repair
@@ -201,6 +159,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         [machineType]: currentMachineData,
         });
 
+        setIsSelectionMade(true);
     };
 
 

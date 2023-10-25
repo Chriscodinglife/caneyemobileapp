@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import { auth } from '../firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { View, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal, TouchableOpacity, Image } from 'react-native';
 
 type LoginModalProps = {
   loginModalVisible: boolean;
-  setLoginModalVisible: () => void;
+  setLoginModalVisible: Dispatch<SetStateAction<boolean>>;
 };
 
 const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModalVisible}) => {
@@ -21,10 +21,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
         const response = await signInWithEmailAndPassword(auth, email, password);
         console.log(response);
         alert("You have successfully signed in!")
-        setLoginModalVisible();
+        setLoginModalVisible(false);
       } catch (error: any) {
         console.log(error);
-        alert("Sign in failed: " + error.message)
+        alert("Sign in failed: Please double check your credentials")
       } finally {
         setLoading(false);
       };
@@ -40,7 +40,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
         alert("Check your email to verify your account.")
       } catch (error: any) {
         console.log(error);
-        alert("Registration Failed: " + error.message)
+        alert("Registration Failed: Please double check your credentials")
       } finally {
         setLoading(false);
       };
@@ -53,12 +53,28 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
         animationType='slide'
         transparent={false}
         visible={loginModalVisible}
-        onRequestClose={() => setLoginModalVisible()}>
-        <View style={styles.container}>
+        onRequestClose={() => setLoginModalVisible(false)}>
+        
+        <View style={styles.mainView}>
+          <View style={styles.mainHeader}>
+
+            <TouchableOpacity onPress={() => setLoginModalVisible(false)}>
+                <Text style={styles.uppercloseButton}>{`<-`}</Text>
+            </TouchableOpacity>
+            
+            <Text style={styles.mainHeaderText}>Can Eye</Text>
+            
+            <View style={styles.imageContainer}>
+              <Image source={require('../assets/caneyeapp_small.png')} style={styles.iconImage}/>
+            </View>
+          </View>
+
+
           <KeyboardAvoidingView behavior='padding'>
+            <Text style={styles.loginHeader}>Login or Sign Up</Text>
             <TextInput 
               value={email}
-              style={styles.input}
+              style={styles.inputBox}
               placeholder='Email'
               autoCapitalize='none'
               onChange={(event) => setEmail(event.nativeEvent.text)}
@@ -66,38 +82,141 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
             <TextInput 
               secureTextEntry={true}
               value={password}
-              style={styles.input}
+              style={styles.inputBox}
               placeholder='Pasword'
               autoCapitalize='none'
               onChange={(event) => setPassword(event.nativeEvent.text)}
             />
-
+            </KeyboardAvoidingView>
             { loading ? <ActivityIndicator size="large" color="#0000ff" />
             : <>
-              <Button title='Login' onPress={() => signIn()}/>
-              <Button title='Create Account' onPress={() => signUp()}/>
-              <Button title='Close' onPress={() => setLoginModalVisible()}/>
-            </> }
-          </KeyboardAvoidingView>
+                <View style={styles.actionButtonsContainer}>
+                  <TouchableOpacity style={styles.loginButton} onPress={() => signIn()}>
+                    <Text style={styles.loginText}>Login</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.registerButton} onPress={() => signUp()}>
+                    <Text style={styles.registerText}>Register</Text>
+                  </TouchableOpacity>
+                </View>
+              </> }
+
+          
+          <TouchableOpacity style={styles.closeButton} onPress={() => setLoginModalVisible(false)}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
         </View>
+
       </Modal>
     );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 20,
+  mainView: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    padding: 30,
+    backgroundColor: 'white'
   },
-  input: {
-    marginVertical: 4,
+  uppercloseButton: {
+    color: 'black',
+    fontWeight: "bold",
+    fontSize: 20,
+    shadowColor: 'white',
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    shadowOffset: { height: 0, width: 0},
+    paddingVertical: 40
+},
+  mainHeader: {
+  },
+  mainHeaderText: {
+    alignSelf: 'center',
+    fontSize: 25,
+    fontWeight: '600',
+    color: 'black',
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    shadowOffset: { height: 3, width: 0},
+  },
+  imageContainer: {
+    alignItems: 'center',
+    shadowColor: 'black',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { height: 10, width: 0},
+    margin: 30
+  },
+  iconImage: {
+    borderRadius: 50,
+  },
+  loginHeader: {
+    alignSelf: 'center',
+    marginBottom: 30,
+    fontSize: 25,
+    color: 'black',
+    fontWeight: '700'
+  },
+  inputBox: {
+    marginVertical: 5,
+    paddingLeft: 15,
+    width: '100%',
     height: 50,
-    borderWidth: 1,
-    borderRadius: 1,
-    padding: 10,
-    backgroundColor: "#fff"
-  }
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: 'black',
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    shadowOffset: { height: 3, width: 0},
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginVertical: 20
+  },
+  loginButton: {
+    backgroundColor: '#2B5CFF',
+    padding: 16,
+    width: '50%',
+    alignItems: 'center',
+    borderRadius: 10
+  },
+  loginText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center'
+  },
+  registerButton: {
+    backgroundColor: '#2B5CFF',
+    padding: 16,
+    width: '50%',
+    alignItems: 'center',
+    borderRadius: 10
+  },
+  registerText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center'
+  },
+  closeButton: {
+    backgroundColor: '#F58264',
+    padding: 16,
+    alignItems: 'center',
+    borderRadius: 10,
+    shadowColor: '#F58264',
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    shadowOffset: { height: 3, width: 0},
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '700'
+}
 })
 
 export default LoginModal;
