@@ -66,7 +66,6 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarP
           onPress={(data, details = null) => {
             isLocationInDB(data, details)
               .then((location) => {
-                console.log(location)
                 locationProcessed(location, location.placeID);
               })
               .catch((error) => {

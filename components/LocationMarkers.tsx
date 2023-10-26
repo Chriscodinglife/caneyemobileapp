@@ -15,16 +15,6 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
   const [selectedPlaceID, setSelectedPlaceID] = useState<string | null>(null);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
 
-
-  const openLocationModal = (placeID: string) => {
-    setSelectedPlaceID(placeID);
-  };
-
-
-  const closeLocationModal = () => {
-    setSelectedPlaceID(null);
-  };
-
   const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
     props.setLocations((prevLocations) => ({...prevLocations, [placeID as string]: location}));
 
@@ -45,18 +35,17 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
             location={location}
             isLocationModalVisible={isLocationModalVisible}
             setLocationModalVisible={setLocationModalVisible}
-            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID}
-            />
+            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
         </View>
-      )
-    }
+      );
+    };
   };
 
   return (
     <>
     {renderMarkersAndLocationModals()}
     </>
-  )
+  );
 
 };
 
