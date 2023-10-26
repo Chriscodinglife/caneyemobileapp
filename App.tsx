@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { machineDB } from './firebaseConfig';
 import AddButton from './components/AddButton';
 import React, { useEffect, useState } from 'react';
-import { ref, child, get } from 'firebase/database';
+import { ref, child, get} from 'firebase/database';
 import LocationListModal from './components/LocationListModal';
 import LocationMarkers from './components/LocationMarkers';
 import GoogleSearchBar from './components/GoogleSearchBar';
@@ -30,8 +30,8 @@ export default function App() {
   }
 
   const dbRef = ref(machineDB);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [isLocationListVisible, setLocationListVisible] = useState(false);
+  const [locations, setLocations] = useState<{[placeId:string]: Location}>({});
+  const [isLocationListVisible, setLocationListVisible] = useState<boolean>(false);
   const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
   const [thisLocation, setThisLocation] = useState<Location>(blankLocation);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
@@ -43,29 +43,39 @@ export default function App() {
     // Retrieve data from Firebase and update the state
     get(child(dbRef, 'machines')).then( (snapshot) => {
       if (snapshot.exists()) {
-        const data = snapshot.val();
-        const locationsArray: Location[] = Object.values(data);
+        const locationsObject: { [placeID: string]: Location } = {};
+
+        snapshot.forEach((childSnapshot) => {
+          const placeID = childSnapshot.key;
+          const locationData = childSnapshot.val();
+          locationsObject[placeID] = locationData;
+        })
 
         const placeDetailsURL = `https://maps.googleapis.com/maps/api/place/details/json?photos&`
         const placePhotoURL = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference`
 
-        locationsArray.forEach( async (location) => {
-          // Try to get the reference for a given location photo based on its place ID
-          try {
-            const response = await fetch(`${placeDetailsURL}place_id=${location.placeID}&key=${apiKey}`);
-            if (response.ok) {
-              const data: PlaceDetailsResponse = await response.json();
-
-              // Set the image url for the given location
-              const imageURL = `${placePhotoURL}=${data.result.photos[0].photo_reference}&key=${apiKey}`
-              location.imageURL = imageURL;
-              setLocations(locationsArray);
-            };
-          } catch (error) {
-            console.error("error fetching image resource", error);
-          };
-        });
+        const updateImageURLs = async (locationsObject: { [placeID: string]: Location }) => {
+          for (const placeID in locationsObject) {
+            if (locationsObject.hasOwnProperty(placeID)) {
+              const location = locationsObject[placeID];
         
+              try {
+                const response = await fetch(`${placeDetailsURL}place_id=${placeID}&key=${apiKey}`);
+                if (response.ok) {
+                  const data = await response.json();
+        
+                  // Update the imageURL for this location
+                  location.imageURL = `${placePhotoURL}=${data.result.photos[0].photo_reference}&key=${apiKey}`;
+                }
+              } catch (error) {
+                console.error("error fetching image resource", error);
+              }
+            }
+          }
+        };
+
+        updateImageURLs(locationsObject);
+          
       } else {
         console.log("No Data available");
       }
@@ -90,7 +100,6 @@ export default function App() {
     setLocationModalVisible(true);
   }
 
-
   const closeLocationModal = () => {
     setThisLocation(blankLocation);
     setLocationModalVisible(false);
@@ -101,22 +110,8 @@ export default function App() {
   return (
     <AppContextProvider>
       <View style={styles.mapContainer}>
-        <GoogleSearchBar
-          openLocationModal={openLocationModal}
-        />
-        <LocationModal
-          selectedLocationIndex={selectedLocationIndex}
-          closeLocationModal={() => closeLocationModal()}
-          location={thisLocation}
-          index={1}
-        />
-        {/* <NewLocationModal
-          newLocationModalVisible={locationModalVisible}
-          closeNewLocationModal={() => closeLocationModal()}
-          location={thisLocation}
-          locations={locations}
-          setLocations={() => setLocations(previousLocations => [...previousLocations, thisLocation])}
-          /> */}
+        <GoogleSearchBar 
+          setLocations={setLocations}/>
         <MapView 
           provider='google' 
           style={styles.map}
@@ -126,10 +121,14 @@ export default function App() {
             longitude: -73.91815489689029,
             latitudeDelta: 0.1,
             longitudeDelta: 0.1}}>
-              <LocationMarkers locations={locations}/> 
+              <LocationMarkers locations={locations} setLocations={setLocations}/> 
         </MapView>
         <AddButton onClick={addButtonClickHandler}/>
-        <LocationListModal locations={locations} closeListModal={closeListModal} isLocationListVisible={isLocationListVisible}/>
+        <LocationListModal 
+          locations={locations} 
+          setLocations={setLocations}
+          isLocationListVisible={isLocationListVisible} 
+          setLocationListVisible={setLocationListVisible} />
         <StatusBar style="auto" />
       </View>
     </AppContextProvider>

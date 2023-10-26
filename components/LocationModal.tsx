@@ -1,7 +1,7 @@
 import LoginModal from './LoginModal';
 import { Location, MachineData, Review, MachineStatus } from './Location';
 import ThumbsDownModal from './thumbsDownModal';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
@@ -12,32 +12,30 @@ import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBa
 import ReportMachinesModal from './ReportMachinesModal';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
-type LocationModalProps = {
-  index: number | null;
+interface LocationModalProps {
+  placeID: string | null;
   location: Location;
-  closeLocationModal: () => void;
-  selectedLocationIndex: number | null;
+  isLocationModalVisible: boolean;
+  setLocationModalVisible: Dispatch<SetStateAction<boolean>>;
+  updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
 }
 
-const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationModal, selectedLocationIndex, index}) => {
+const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) => {
   
-  const dbRef = ref(machineDB);
   const { user, updateUser } = useAppContext();
-  const [currentLocation, setCurrentLocation] = useState(location);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
-  const [thumbsDownModalVisible, setThumbsdownModalVisible] = useState(false);
   const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false)
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
 
-  const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-  const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-  const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+  const goodGlassMachines = props.location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+  const goodCanMachines = props.location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+  const goodBottleMachines = props.location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
 
-  const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
-  const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
-  const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
+  const numberGlassMachines = props.location.recentReview?.machineData?.glass.count ?? 0;
+  const numberCanMachines = props.location.recentReview?.machineData?.can.count ?? 0;
+  const numberBottleMachines = props.location.recentReview?.machineData?.bottle.count ?? 0;
 
-  const numberOfReports = location.reviews?.length ?? 0
+  const numberOfReports = props.location.reviews?.length ?? 0
 
 
   const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
@@ -51,31 +49,26 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
 
   }, []);
 
-  // Listen for changes in the location prop
-  useEffect(() => {
-    setCurrentLocation(location);
-  }, [currentLocation]);
-
 
   return (
       <Modal
         animationType='slide'
         transparent={false}
-        visible={selectedLocationIndex === index} // Check if this marker is selected
-        onRequestClose={() => closeLocationModal()}
+        visible={props.isLocationModalVisible} // Check if this marker is selected
+        onRequestClose={() => props.setLocationModalVisible(false)}
       >
         <View style={styles.mainView}>
-            <ImageBackground source={{ uri: currentLocation.imageURL}} style={styles.locationImage}>
+            <ImageBackground source={{ uri: props.location.imageURL}} style={styles.locationImage}>
               <View style={styles.locationMainBlackBoxHeader}>
                 <View style={styles.locationHeaderBox}>
-                <TouchableOpacity onPress={() => closeLocationModal()}>
+                <TouchableOpacity onPress={() => props.setLocationModalVisible(false)}>
                     <Text style={styles.closeButtonText}>{`<-`}</Text>
                 </TouchableOpacity>
                   <Text style={styles.locationNameSubHeader}>What's recycling at</Text>
-                  <Text style={styles.locationName}>{location.name}</Text>
+                  <Text style={styles.locationName}>{props.location.name}</Text>
                   <View style={styles.locationAddressBar}>
                     <MaterialIcons name='location-pin' style={styles.locationAddress}/>
-                    <Text style={styles.locationAddress}>{location.address}</Text>
+                    <Text style={styles.locationAddress}>{props.location.address}</Text>
                   </View>
                 </View>
               </View>
@@ -108,7 +101,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                 </View>
 
                 <View style={styles.reportBoxFooter}>
-                  <Text style={styles.reportBoxDate}>Posted on {currentLocation.recentReview?.date}</Text>
+                  <Text style={styles.reportBoxDate}>Posted on {props.location.recentReview?.date}</Text>
                   <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
                     <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
                   </TouchableOpacity>
@@ -147,9 +140,10 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                       </TouchableOpacity>
                     </View>
                     <ReportMachinesModal
+                      placeID={props.placeID}
+                      location={props.location}
                       reportMachinesModalVisible={reportMachinesModalVisible}
-                      location={currentLocation}
-                      setCurrentLocation={setCurrentLocation}
+                      updateLocationAtThisPlaceID={props.updateLocationAtThisPlaceID}
                       setReportMachinesModalVisible={setReportMachinesModalVisible} />
                   </>
                 )
@@ -163,7 +157,7 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
                       setLoginModalVisible={setLoginModalVisible} />
                   </>
                 )}
-                <TouchableOpacity style={styles.looksGoodButton} onPress={() => closeLocationModal()}>
+                <TouchableOpacity style={styles.looksGoodButton} onPress={() => props.setLocationModalVisible(false)}>
                   <Text style={styles.looksGoodText}>Looks Good</Text>
                 </TouchableOpacity>
               </View>
@@ -171,8 +165,8 @@ const LocationModal: React.FC<LocationModalProps> = ({ location, closeLocationMo
 
         </View>
         <LocationReportListModal 
-          location={currentLocation}
-          reviews={currentLocation.reviews}
+          location={props.location}
+          reviews={props.location.reviews}
           isLocationReportListModalVisible={locationReportListModalVisible}
           closeLocationReportListModal={setLocationReportListModalVisible}/>
       </Modal>

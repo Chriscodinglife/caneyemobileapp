@@ -9,10 +9,11 @@ import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
-  location: Location; 
-  reportMachinesModalVisible: boolean;
-  setCurrentLocation: Dispatch<SetStateAction<Location>>
-  setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
+    placeID: string | null;
+    location: Location; 
+    reportMachinesModalVisible: boolean;
+    updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
+    setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
 }
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
@@ -62,29 +63,13 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                 return;
             }
             setStep(step + 1);
-        } 
-            // else {
-            // // Save the report data to your database or perform further processing
-            // // Reset the step and data for the next report
-            //     if (!isSelectionMade) {
-            //         // Check if a selection has been made, show an alert if not
-            //         Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
-            //         return;
-            //     }
-            //     setStep(1);
-            //     setIsSelectionMade(false);
-            //     setMachineData({
-            //         glass: { count: 0, status: [] },
-            //         can: { count: 0, status: [] },
-            //         bottle: { count: 0, status: [] },
-            //     });
-            // };
+        }; 
     };
 
     const handleSubmit = () => {
         // Submit the data up to database
 
-        const giveMachineType = "bottle"
+        const giveMachineType = "bottle";
 
         const count = (machineData as MachineData)[giveMachineType as MachineType].count;
             const countStatus = (machineData as MachineData)[giveMachineType as MachineType].status.length;
@@ -93,7 +78,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             // Check if a selection has been made, show an alert if not
             Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
             return;
-        }
+        };
 
         const currentDate = new Date();
 
@@ -127,7 +112,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                     currentLocationData.recentReview = newReview;
 
                     // Update the location locally and in the database
-                    props.setCurrentLocation(currentLocationData);
+                    props.updateLocationAtThisPlaceID(currentLocationData, props.placeID);
 
                     update(locationRef, currentLocationData)
                     .then(() => {
@@ -151,7 +136,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                     currentLocationData.recentReview = newReview;
 
                     // Update the location locally and in the database
-                    props.setCurrentLocation(currentLocationData);
+                    props.updateLocationAtThisPlaceID(currentLocationData, props.placeID);
 
                     set(locationRef, currentLocationData)
                     .then(() => {
@@ -218,7 +203,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const decrementMachineCount = (machineType: MachineType) => {
         const currentMachineData = { ...machineData[machineType] };
         currentMachineData.count = Math.max(0, currentMachineData.count - 1);
-
+        
+        if (currentMachineData.status.length > 0) {
+            currentMachineData.status.pop();
+        }
+        
         setMachineData({
         ...machineData,
         [machineType]: currentMachineData,

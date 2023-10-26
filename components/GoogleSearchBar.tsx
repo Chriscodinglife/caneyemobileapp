@@ -1,16 +1,26 @@
+import { useState, Dispatch, SetStateAction } from 'react';
 import { StyleSheet } from 'react-native';
 import { machineDB, auth } from '../firebaseConfig';
 import { Location, apiKey } from './Location';
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { ref, child, update, get } from 'firebase/database';
+import LocationModal from './LocationModal';
 
-type GoogleSearchBarProps = {
-    openLocationModal: (location: Location, index: number) => void;
+interface GoogleSearchBarProps {
+  setLocations: Dispatch<SetStateAction<{[placeID: string] : Location}>>;
 }
 
-const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openLocationModal }) => {
+const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarProps) => {
 
   const dbRef = ref(machineDB);
+  const [isLocationModalVisible, setLocationModalVisible] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<Location>();
+  const [placeID, setPlaceID] = useState<string | null>(null);
+
+  const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
+    props.setLocations((prevLocations) => ({...prevLocations, [placeID as string]: location}));
+
+  };
 
   const isLocationInDB = (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
     return new Promise<Location>((resolve, reject) => {
@@ -43,14 +53,21 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openLocationModal }) 
     });
   };
 
+  const locationProcessed = (location: Location, placeID: string) => {
+    setCurrentLocation(location);
+    setPlaceID(placeID);
+    setLocationModalVisible(true);
+  }
+
     return (
+      <>
         <GooglePlacesAutocomplete
           placeholder="Search and Add a Location"
           onPress={(data, details = null) => {
             isLocationInDB(data, details)
               .then((location) => {
                 console.log(location)
-                openLocationModal(location, 1);
+                locationProcessed(location, location.placeID);
               })
               .catch((error) => {
                 // Handle any errors here
@@ -66,8 +83,20 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = ({ openLocationModal }) 
             key: `${apiKey}`, 
             language: 'en',
           }}
-          styles={searchBarStyle}
-        />
+          styles={searchBarStyle} />
+          { currentLocation ? (
+          <LocationModal 
+            placeID={placeID}
+            location={currentLocation}
+            isLocationModalVisible={isLocationModalVisible}
+            setLocationModalVisible={setLocationModalVisible}
+            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
+          ) : (
+            <>
+            </>
+          )}
+          
+        </>
     )
 };
 

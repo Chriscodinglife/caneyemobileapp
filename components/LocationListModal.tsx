@@ -1,42 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import LocationModal from './LocationModal';
 import { Location, MachineStatus } from './Location';
 import { useAppContext } from './AppContextProvider';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TouchableHighlight, Modal } from 'react-native';
 
 
-type LocationListModalProps = {
-  locations: Location[];
-  closeListModal: () => void;
+interface LocationListModalProps {
+  locations: {[placeID: string]: Location};
+  setLocations: Dispatch<SetStateAction<{[placeID: string] : Location}>>;
   isLocationListVisible: boolean;
+  setLocationListVisible: Dispatch<SetStateAction<boolean>>;
+  
 };
 
-const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeListModal, isLocationListVisible }) => {
-  const { user, updateUser } = useAppContext();
+const LocationListModal: React.FC<LocationListModalProps> = (props: LocationListModalProps) => {
   const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
+  const [selectedPlaceID, setSelectedPlaceID] = useState<string | null>(null);
+  const [isLocationModalVisible, setLocationModalVisible] = useState(false);
 
 
-  const openLocationModal = (index: number) => {
-    setSelectedLocationIndex(index);
-  }
+  const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
+    props.setLocations((prevLocations) => ({...prevLocations, [placeID as string]: location}));
+
+  };
+
+  const renderScrollView = () => {
+    for (const placeID in props.locations) {
+      const location = props.locations[placeID];
+      const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+      const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+      const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+
+      const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
+      const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
+      const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
 
 
-  const closeLocationModal = () => {
-    setSelectedLocationIndex(null);
-  }
+      const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
+      const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
+      
+      return (
+            <View key={placeID} style={styles.locationItem}>
+              <TouchableOpacity style={styles.locationContent} onPress={() => setLocationModalVisible(true)}>
+                <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
+                <View style={styles.locationDetails}>
+                  <Text style={styles.locationName}>{location.name}</Text>
+                  <Text style={styles.locationAddress}>{location.address}</Text>
+                  <Text style={styles.locationStatus}>{`🥫 ${goodMachinesCount}`} machines</Text>
+                </View>
+                <LocationModal 
+                  placeID={placeID}
+                  location={location}
+                  isLocationModalVisible={isLocationModalVisible}
+                  setLocationModalVisible={setLocationModalVisible}
+                  updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
+              </TouchableOpacity>
+            </View>
+        )
+      };
+  };
 
   
   return (
     <Modal
       animationType='slide'
       transparent={true}
-      visible={isLocationListVisible}
-      onRequestClose={() => closeListModal()}>
+      visible={props.isLocationListVisible}
+      onRequestClose={() => props}>
 
       <View style={styles.mainView}>
 
           <View style={styles.headerBox}>
-            <TouchableOpacity onPress={() => closeListModal()}>
+            <TouchableOpacity onPress={() => props.setLocationListVisible(false)}>
                 <Text style={styles.closeButtonText}>{`<-`}</Text>
             </TouchableOpacity>
             
@@ -46,45 +81,17 @@ const LocationListModal: React.FC<LocationListModalProps> = ({ locations, closeL
 
           <View style={styles.scrollLocations}>
             <ScrollView>
-              { locations.map( (location, index) => { 
-
-                const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-                const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-                const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-
-                const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
-                const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
-                const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;
-
-
-                const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
-                const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
-                return (
-                  <View key={index} style={styles.locationItem}>
-                    <TouchableOpacity style={styles.locationContent} onPress={() => openLocationModal(index)}>
-                      <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
-                      <View style={styles.locationDetails}>
-                        <Text style={styles.locationName}>{location.name}</Text>
-                        <Text style={styles.locationAddress}>{location.address}</Text>
-                        <Text style={styles.locationStatus}>{`🥫 ${goodMachinesCount}`} machines</Text>
-                      </View>
-                      <LocationModal 
-                        selectedLocationIndex={selectedLocationIndex}
-                        closeLocationModal={() => closeLocationModal()}
-                        location={location}
-                        index={index}/>
-                    </TouchableOpacity>
-                  </View>
-                )
-              })}
-              <TouchableOpacity style={styles.searchNewButton}onPress={() => closeListModal()}>
+              <>
+              {renderScrollView()}
+              </>
+              <TouchableOpacity style={styles.searchNewButton}onPress={() => props.setLocationListVisible(false)}>
                 <Text style={styles.searchNewText}>{`Don't see a location?\nSearch for one and add it!`}</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
 
           <View>
-            <TouchableOpacity style={styles.closeButton} onPress={() => closeListModal()}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => props.setLocationListVisible(false)}>
               <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
           </View>

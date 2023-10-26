@@ -1,45 +1,63 @@
 import { Location } from './Location';
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import LocationModal from './LocationModal';
 import { Marker, Callout } from 'react-native-maps';
 import { View, Text, StyleSheet, Modal, Button, Image } from 'react-native';
+import { setLogLevel } from 'firebase/app';
+import { update } from 'firebase/database';
 
-type LocationMarkersProps = {
-  locations: Location[] | undefined;
+interface LocationMarkersProps {
+  locations: { [placeID: string]: Location } | undefined;
+  setLocations: Dispatch<SetStateAction<{[placeID: string] : Location}>>;
 };
 
-const LocationMarkers: React.FC<LocationMarkersProps> = ({ locations }) => {
-  const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
+const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersProps) => {
+  const [selectedPlaceID, setSelectedPlaceID] = useState<string | null>(null);
+  const [isLocationModalVisible, setLocationModalVisible] = useState(false);
 
 
-  const openLocationModal = (index: number) => {
-    setSelectedLocationIndex(index);
-  }
+  const openLocationModal = (placeID: string) => {
+    setSelectedPlaceID(placeID);
+  };
 
 
   const closeLocationModal = () => {
-    setSelectedLocationIndex(null);
-  }
+    setSelectedPlaceID(null);
+  };
 
-  
-  return locations?.map((location, index) => {
-    return (
-      <View key={index}>
-        <Marker
-          coordinate={location.location}
-          style={styles.marker}
-          title={location.name}
-          onPress={() => openLocationModal(index)} // Pass the index to openMarkerModal
-        >
-        </Marker>
-        <LocationModal 
-          selectedLocationIndex={selectedLocationIndex}
-          closeLocationModal={() => closeLocationModal()}
-          location={location}
-          index={index}/>
-      </View>
-    )
-  });
+  const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
+    props.setLocations((prevLocations) => ({...prevLocations, [placeID as string]: location}));
+
+  };
+
+  const renderMarkersAndLocationModals = () => {
+    for (const placeID in props.locations) {
+      const location = props.locations[placeID];
+      return (
+        <View key={placeID}>
+          <Marker
+            coordinate={location.location}
+            style={styles.marker}
+            title={location.name}
+            onPress={() => setLocationModalVisible(true)}/>
+          <LocationModal 
+            placeID={placeID}
+            location={location}
+            isLocationModalVisible={isLocationModalVisible}
+            setLocationModalVisible={setLocationModalVisible}
+            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID}
+            />
+        </View>
+      )
+    }
+  };
+
+  return (
+    <>
+    {renderMarkersAndLocationModals()}
+    </>
+  )
+
 };
 
 const styles = StyleSheet.create({
