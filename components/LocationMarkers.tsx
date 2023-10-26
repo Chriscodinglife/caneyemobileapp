@@ -23,6 +23,8 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
   const renderMarkersAndLocationModals = () => {
     for (const placeID in props.locations) {
       const location = props.locations[placeID];
+      console.log(location);
+      console.log("hello");
       return (
         <View key={placeID}>
           <Marker

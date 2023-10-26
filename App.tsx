@@ -49,7 +49,9 @@ export default function App() {
           const placeID = childSnapshot.key;
           const locationData = childSnapshot.val();
           locationsObject[placeID] = locationData;
+
         })
+
 
         const placeDetailsURL = `https://maps.googleapis.com/maps/api/place/details/json?photos&`
         const placePhotoURL = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference`
@@ -75,6 +77,7 @@ export default function App() {
         };
 
         updateImageURLs(locationsObject);
+        setLocations(locationsObject);
           
       } else {
         console.log("No Data available");
@@ -121,7 +124,9 @@ export default function App() {
             longitude: -73.91815489689029,
             latitudeDelta: 0.1,
             longitudeDelta: 0.1}}>
-              <LocationMarkers locations={locations} setLocations={setLocations}/> 
+              <LocationMarkers 
+                locations={locations} 
+                setLocations={setLocations}/> 
         </MapView>
         <AddButton onClick={addButtonClickHandler}/>
         <LocationListModal 
