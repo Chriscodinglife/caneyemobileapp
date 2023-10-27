@@ -1,7 +1,7 @@
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import { auth } from '../firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal, TouchableOpacity, Image, Platform, TouchableWithoutFeedback, Keyboard, } from 'react-native';
 
 type LoginModalProps = {
   loginModalVisible: boolean;
@@ -49,12 +49,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
 
 
     return (
+
       <Modal
         animationType='slide'
         transparent={false}
         visible={loginModalVisible}
         onRequestClose={() => setLoginModalVisible(false)}>
         
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{flex: 1}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.mainView}>
           <View style={styles.mainHeader}>
 
@@ -70,12 +73,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
           </View>
 
 
-          <KeyboardAvoidingView behavior='padding'>
+         
             <Text style={styles.loginHeader}>Login or Sign Up</Text>
             <TextInput 
               value={email}
               style={styles.inputBox}
               placeholder='Email'
+              placeholderTextColor={'black'}
               autoCapitalize='none'
               onChange={(event) => setEmail(event.nativeEvent.text)}
             />
@@ -84,10 +88,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
               value={password}
               style={styles.inputBox}
               placeholder='Pasword'
+              placeholderTextColor={'black'}
               autoCapitalize='none'
               onChange={(event) => setPassword(event.nativeEvent.text)}
             />
-            </KeyboardAvoidingView>
+
+          
             { loading ? <ActivityIndicator size="large" color="#0000ff" />
             : <>
                 <View style={styles.actionButtonsContainer}>
@@ -101,12 +107,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
               </> }
 
           
+
+          
           <TouchableOpacity style={styles.closeButton} onPress={() => setLoginModalVisible(false)}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+            <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+
+
         </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
       </Modal>
+
     );
 };
 
@@ -114,7 +127,7 @@ const styles = StyleSheet.create({
   mainView: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     alignContent: 'center',
     padding: 30,
     backgroundColor: 'white'
@@ -146,7 +159,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 10,
     shadowOffset: { height: 10, width: 0},
-    margin: 30
+    margin: 20
   },
   iconImage: {
     borderRadius: 50,
@@ -173,7 +186,7 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 7,
     marginVertical: 20
   },
   loginButton: {

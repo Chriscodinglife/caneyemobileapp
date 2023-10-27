@@ -1,8 +1,9 @@
 
+import { Camera, CameraType } from 'expo-camera';
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
 import { ref, child, update, get, set } from 'firebase/database';
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState, Dispatch, SetStateAction, useRef } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
@@ -20,6 +21,14 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const dbRef = ref(machineDB);
     // Set a counter so that we can keep track of which step we are on
     const [step, setStep] = useState(1);
+
+    // Set some important camera controls
+    const [type, setType] = useState(CameraType.back);
+    const [permission, requestPermission] = Camera.useCameraPermissions();
+
+    function toggleCameraType() {
+        setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    };
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -44,13 +53,14 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
+        console.log("Current step is " + String(step))
         if (step < 3) {
             let giveMachineType = ""
             if (step == 1) {
                 giveMachineType = "glass"
             } else if (step == 2) {
                 giveMachineType = "can"
-            } else {
+            } else if (step == 3) {
                 giveMachineType = "bottle"
             }
 
@@ -62,8 +72,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                 Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
                 return;
             }
-            setStep(step + 1);
+            
         }; 
+        setStep(step + 1);
     };
 
     const handleSubmit = () => {
@@ -154,7 +165,13 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
         // Run the function
         addReviewToLocation(props.location);
-        handleClose();
+        setStep(1);
+        setMachineData({
+            glass: { count: 0, status: [] },
+            can: { count: 0, status: [] },
+            bottle: { count: 0, status: [] },
+        });
+        props.setReportMachinesModalVisible(false);
         
     };
 
@@ -272,7 +289,19 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             </View>
                             
                         </>
-                    ) : null}
+                    ) : step === 4 ? (
+                        <>
+                        <View style={styles.cameraContainer}>
+                            <Camera style={styles.camera} type={type}>
+                                <View>
+                                    <TouchableOpacity onPress={toggleCameraType}>
+                                        <Text style={{backgroundColor: 'white'}}>Flip Camera</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </Camera>
+                        </View>
+                        </>
+                    ) : null }
                 </View>
                 {step === 1 || step === 2 || step === 3 ? (
                     <>
@@ -293,16 +322,19 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             </View>
                         </>
                     ) : null}
-                    {step === 1 || step === 2 ? (
+                    {step === 1 || step === 2 || step === 3 ? (
                         <>
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleNext}>
                                 <Text style={styles.nextSubmitText}>Next</Text>
                             </TouchableOpacity>
                         </>
+                    ) : step === 4 ? (
+                        <>
+                        </>
                     ) : (
                         <>
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
-                                <Text style={styles.nextSubmitText}>Submit</Text>
+                                <Text style={styles.nextSubmitText}>Submit Report</Text>
                              </TouchableOpacity>
                         </>
                     )}
@@ -342,6 +374,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '500',
         paddingVertical: 20,
+    },
+    cameraContainer: {
+        
+    },
+    camera: {
+        flex: 1
     },
     scrollMachines: {
         flex: 1,
