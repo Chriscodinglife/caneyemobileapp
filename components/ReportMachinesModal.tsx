@@ -2,9 +2,10 @@
 import { Camera, CameraType } from 'expo-camera';
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
+import CameraModal from './CameraModal';
 import { ref, child, update, get, set } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction, useRef } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
 
@@ -21,14 +22,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const dbRef = ref(machineDB);
     // Set a counter so that we can keep track of which step we are on
     const [step, setStep] = useState(1);
+    const [picture, setPicture] = useState<string | null>(null);
 
     // Set some important camera controls
     const [type, setType] = useState(CameraType.back);
-    const [permission, requestPermission] = Camera.useCameraPermissions();
-
-    function toggleCameraType() {
-        setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-    };
+    const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(true);
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -53,7 +51,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
-        console.log("Current step is " + String(step))
         if (step < 3) {
             let giveMachineType = ""
             if (step == 1) {
@@ -73,8 +70,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                 return;
             }
             
-        }; 
+        } 
         setStep(step + 1);
+        if (step === 4) {
+            setCameraModalVisible(true);
+        }; 
     };
 
     const handleSubmit = () => {
@@ -171,7 +171,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             can: { count: 0, status: [] },
             bottle: { count: 0, status: [] },
         });
-        props.setReportMachinesModalVisible(false);
+        props.setReportMachinesModalVisible(true);
         
     };
 
@@ -273,13 +273,13 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         onRequestClose={() => handleClose()}
         >
             <View style={styles.mainView}>
-                <View style={styles.headerBox}>  
+                <View style={styles.headerBox}>
+                    <TouchableOpacity onPress={() => handleClose()}>
+                        <Text style={styles.closeButtonText}>{`<-`}</Text>
+                    </TouchableOpacity>
                     {step === 1 || step === 2 || step === 3 ? (
                         <>
                             <View> 
-                                <TouchableOpacity onPress={() => handleClose()}>
-                                    <Text style={styles.closeButtonText}>{`<-`}</Text>
-                                </TouchableOpacity>
                                 <Text style={styles.mainHeader}>
                                     {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
                                 </Text>
@@ -291,17 +291,18 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                         </>
                     ) : step === 4 ? (
                         <>
-                        <View style={styles.cameraContainer}>
-                            <Camera style={styles.camera} type={type}>
-                                <View>
-                                    <TouchableOpacity onPress={toggleCameraType}>
-                                        <Text style={{backgroundColor: 'white'}}>Flip Camera</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </Camera>
-                        </View>
+                        <CameraModal
+                            setPicture={setPicture}
+                            handleNext={handleNext}
+                            isCameraModalVisible={isCameraModalVisible} 
+                            setCameraModalVisible={setCameraModalVisible}/>
                         </>
-                    ) : null }
+                    ) : (
+                        <>
+                        <ImageBackground style={styles.imageTaken} source={{ uri: picture as string}}/>
+
+                        </>
+                    ) }
                 </View>
                 {step === 1 || step === 2 || step === 3 ? (
                     <>
@@ -375,11 +376,10 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         paddingVertical: 20,
     },
-    cameraContainer: {
-        
-    },
-    camera: {
-        flex: 1
+    imageTaken: {
+        flex: 1,
+        width: '100%',
+        height: '100%'
     },
     scrollMachines: {
         flex: 1,

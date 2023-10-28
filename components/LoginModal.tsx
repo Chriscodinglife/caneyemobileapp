@@ -87,7 +87,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
               secureTextEntry={true}
               value={password}
               style={styles.inputBox}
-              placeholder='Pasword'
+              placeholder='Password'
               placeholderTextColor={'black'}
               autoCapitalize='none'
               onChange={(event) => setPassword(event.nativeEvent.text)}

@@ -47,6 +47,12 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Can Eye would to access your photos so you can share them on reports."
+        }
       ]
     ]
   }
