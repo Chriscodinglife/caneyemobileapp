@@ -4,8 +4,8 @@ import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
 import CameraModal from './CameraModal';
 import { ref, child, update, get, set } from 'firebase/database';
-import React, { useState, Dispatch, SetStateAction, useRef } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground} from 'react-native';
+import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
 
@@ -16,7 +16,9 @@ interface ReportMachinesModalProps {
     reportMachinesModalVisible: boolean;
     updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
     setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
+    
 }
+
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
     const dbRef = ref(machineDB);
@@ -26,7 +28,27 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     // Set some important camera controls
     const [type, setType] = useState(CameraType.back);
-    const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(true);
+    const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(false);
+    const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
+    const [machineStepType, setMachineStepType] = useState<string>('glass');
+
+    useEffect(() => {
+        if (picture) {
+          Image.getSize(
+            picture,
+            (width, height) => {
+              const calculatedAspectRatio = width / height;
+              setAspectRatio(calculatedAspectRatio);
+            },
+            error => {
+              console.error('Error getting image dimensions:', error);
+            }
+          );
+        }
+    }, [picture]);
+
+
+
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -49,33 +71,49 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     };
 
 
+    useEffect(() => {
+        // When the user confirms the picture, close the modal and proceed to the next step
+        if (step === 4) {
+          setCameraModalVisible(true);
+        }
+      }, [step]);
+
+
+    // track when step changes to change the value of the MachineStep Type
+    useEffect(() => {
+        if (step == 1) {
+            setMachineStepType('glass');
+        } else if (step == 2) {
+            setMachineStepType('can')
+        } else if (step == 3) {
+            setMachineStepType('bottle')
+        };
+    }, [step]);
+
+
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
-        if (step < 3) {
-            let giveMachineType = ""
-            if (step == 1) {
-                giveMachineType = "glass"
-            } else if (step == 2) {
-                giveMachineType = "can"
-            } else if (step == 3) {
-                giveMachineType = "bottle"
-            }
+        if (step <= 3) {
 
-            const count = (machineData as MachineData)[giveMachineType as MachineType].count;
-            const countStatus = (machineData as MachineData)[giveMachineType as MachineType].status.length;
+            const count = (machineData as MachineData)[machineStepType as MachineType].count;
+            const countStatus = (machineData as MachineData)[machineStepType as MachineType].status.length;
 
             if (count != countStatus) {
                 // Check if a selection has been made, show an alert if not
                 Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
                 return;
+            } else if (count == 0) {
+                Alert.alert('Selection Required', 'Please add a machine!');
+                return;
             }
-            
-        } 
+        };
+
         setStep(step + 1);
         if (step === 4) {
             setCameraModalVisible(true);
         }; 
     };
+
 
     const handleSubmit = () => {
         // Submit the data up to database
@@ -171,7 +209,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             can: { count: 0, status: [] },
             bottle: { count: 0, status: [] },
         });
-        props.setReportMachinesModalVisible(true);
+        props.setReportMachinesModalVisible(false);
         
     };
 
@@ -273,13 +311,15 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         onRequestClose={() => handleClose()}
         >
             <View style={styles.mainView}>
+
                 <View style={styles.headerBox}>
-                    <TouchableOpacity onPress={() => handleClose()}>
-                        <Text style={styles.closeButtonText}>{`<-`}</Text>
-                    </TouchableOpacity>
                     {step === 1 || step === 2 || step === 3 ? (
+                        
                         <>
                             <View> 
+                            <TouchableOpacity onPress={() => handleClose()}>
+                                <Text style={styles.closeButtonText}>{`<-`}</Text>
+                            </TouchableOpacity>
                                 <Text style={styles.mainHeader}>
                                     {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
                                 </Text>
@@ -289,7 +329,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             </View>
                             
                         </>
+
                     ) : step === 4 ? (
+
                         <>
                         <CameraModal
                             setPicture={setPicture}
@@ -297,18 +339,16 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             isCameraModalVisible={isCameraModalVisible} 
                             setCameraModalVisible={setCameraModalVisible}/>
                         </>
-                    ) : (
-                        <>
-                        <ImageBackground style={styles.imageTaken} source={{ uri: picture as string}}/>
 
-                        </>
-                    ) }
+                    ) : null}
                 </View>
+
                 {step === 1 || step === 2 || step === 3 ? (
                     <>
                         {renderMachines(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')}
                     </>
                 ) : null}
+
                 <View>
                     {step === 1 || step === 2 || step === 3 ? (
                         <>
@@ -323,24 +363,45 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             </View>
                         </>
                     ) : null}
+
                     {step === 1 || step === 2 || step === 3 ? (
+                        
                         <>
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleNext}>
                                 <Text style={styles.nextSubmitText}>Next</Text>
                             </TouchableOpacity>
                         </>
+
                     ) : step === 4 ? (
+
                         <>
                         </>
-                    ) : (
-                        <>
-                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
-                                <Text style={styles.nextSubmitText}>Submit Report</Text>
-                             </TouchableOpacity>
-                        </>
-                    )}
+
+                    ) : null}
                 </View>
+
             </View>
+
+        {step === 5 ? (
+            <View style={styles.submitReportCheckView}>
+
+                <ImageBackground style={styles.imageTaken} source={{ uri: picture as string}} resizeMode='cover'>
+                    <View style={styles.imageBGFlexBox}>
+                        <TouchableOpacity onPress={() => handleClose()}>
+                            <Text style={styles.closeButtonText}>{`<-`}</Text>
+                        </TouchableOpacity>
+
+                            <Text>Ready to submit Report?</Text>
+
+                        <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
+                            <Text style={styles.nextSubmitText}>Submit Report</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ImageBackground>
+
+            </View>
+        ): null}
+            
         </Modal>
     );
 };
@@ -352,6 +413,21 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: 30
+    },
+    submitReportCheckView: {
+        flex: 1,
+    },    
+    imageTaken: {
+        height: undefined, 
+        width: '100%',
+        flex: 1,
+    },
+    imageBGFlexBox: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: 30
+
     },
     closeButtonText: {
         color: 'grey',
@@ -376,11 +452,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         paddingVertical: 20,
     },
-    imageTaken: {
-        flex: 1,
-        width: '100%',
-        height: '100%'
-    },
+
     scrollMachines: {
         flex: 1,
         backgroundColor: "#faf0e64D",
