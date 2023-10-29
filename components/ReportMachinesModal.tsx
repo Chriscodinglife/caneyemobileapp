@@ -7,7 +7,7 @@ import { ref, child, update, get, set } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
-
+import ReportBox from './reportBox';
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
@@ -20,7 +20,6 @@ interface ReportMachinesModalProps {
 }
 
 const win = Dimensions.get('screen');
-
 
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
@@ -116,9 +115,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             setCameraModalVisible(true);
         }; 
     };
-
-    console.log("Step is: " + step);
-
 
     const handleSubmit = () => {
         // Submit the data up to database
@@ -387,6 +383,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                         </TouchableOpacity>
 
                         <View>
+
+                            <ReportBox machineData={machineData} location={null} showReportBoxFooter={false}/>
+
                             <Text style={styles.confirmationText}>Ready to submit Report?</Text>
 
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>

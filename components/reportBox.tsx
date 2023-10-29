@@ -7,10 +7,9 @@ interface ReportBoxProps {
     machineData: MachineData;
     location: Location | null;
     showReportBoxFooter: boolean;
-
 }
 
-const reportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
+const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
     const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
 
@@ -50,18 +49,22 @@ const reportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
             </View>
 
-            <View style={styles.reportBoxFooter}>
-                <Text style={styles.reportBoxDate}>Posted on {props?.location?.recentReview?.date}</Text>
-                <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
-                    <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
-                </TouchableOpacity>
-            </View>
+            { props.showReportBoxFooter ? (
+                <>
+                <View style={styles.reportBoxFooter}>
+                    <Text style={styles.reportBoxDate}>Posted on {props?.location?.recentReview?.date}</Text>
+                    <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
+                        <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
+                    </TouchableOpacity>
+                </View>
 
-            <LocationReportListModal 
-            location={props.location as Location}
-            reviews={props?.location?.reviews}
-            isLocationReportListModalVisible={locationReportListModalVisible}
-            closeLocationReportListModal={setLocationReportListModalVisible}/>
+                <LocationReportListModal 
+                    location={props.location as Location}
+                    reviews={props?.location?.reviews}
+                    isLocationReportListModalVisible={locationReportListModalVisible}
+                    closeLocationReportListModal={setLocationReportListModalVisible}/>
+                </>
+            ) : null }
 
         </View>
     );
@@ -75,12 +78,13 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       alignItems: 'center',
       borderRadius: 10,
-      marginBottom: 100,
       shadowColor: "black",
       shadowOpacity: 0.3,
       shadowRadius: 15,
       shadowOffset: {width: 0, height: 10},
-      padding: 15
+      padding: 15,
+      height: '100%',
+      width: '100%'
     },
     reviewBoxHeader: {
       alignSelf: 'flex-start',
@@ -93,9 +97,8 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       width: '100%',
       height: '130%',
+      marginVertical: 30,
       alignItems: 'center',
-      padding: 10,
-      margin: 10,
       backgroundColor: '#F6F5F1',
       borderRadius: 20
     },
@@ -171,4 +174,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default reportBox;
+export default ReportBox;
