@@ -21,17 +21,13 @@ interface ReportMachinesModalProps {
     
 }
 
-const win = Dimensions.get('screen');
-
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
     const dbRef = ref(machineDB);
     // Set a counter so that we can keep track of which step we are on
     const [step, setStep] = useState(1);
     const [picture, setPicture] = useState<string | null>(null);
-    const [type, setType] = useState(CameraType.back);
     const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(false);
-    const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
     const [machineStepType, setMachineStepType] = useState<string>('glass');
     const [reportBoxVisible, setReportBoxVisible] = useState<boolean>(true);
 
@@ -47,6 +43,10 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     // Close down this modal when we need to
     const handleClose = () => {
         setStep(1);
+        setPicture(null);
+        setMachineStepType('glass');
+        setCameraModalVisible(false);
+        setReportBoxVisible(true);
         setMachineData({
             glass: { count: 0, status: [] },
             can: { count: 0, status: [] },
@@ -99,7 +99,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             }
         };
 
-        console.log("Step is: " + step);
         setStep(step + 1);
         if (step === 4) {
             setCameraModalVisible(true);
@@ -125,8 +124,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
             return ImageURL;
         } catch (error) {
-            alert("Image can't be uploaded. Please try again later")
-            return ""
+            alert("Image can't be uploaded. Please try again later");
+            return "";
         }
     }
 
@@ -213,6 +212,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         addReviewToLocation(props.location);
         setStep(1);
         setPicture(null);
+        setMachineStepType('glass');
+        setCameraModalVisible(false);
+        setReportBoxVisible(true);
         setMachineData({
             glass: { count: 0, status: [] },
             can: { count: 0, status: [] },
