@@ -8,6 +8,8 @@ import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 're
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 import ReportBox from './reportBox';
+import { storage } from '../firebaseConfig';
+import { getDownloadURL, ref as storageRef, uploadBytes, uploadString } from 'firebase/storage';
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
@@ -27,27 +29,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     // Set a counter so that we can keep track of which step we are on
     const [step, setStep] = useState(1);
     const [picture, setPicture] = useState<string | null>(null);
-
-    // Set some important camera controls
     const [type, setType] = useState(CameraType.back);
     const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(false);
     const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
     const [machineStepType, setMachineStepType] = useState<string>('glass');
-
-    useEffect(() => {
-        if (picture) {
-          Image.getSize(
-            picture,
-            (width, height) => {
-              const calculatedAspectRatio = width / height;
-              setAspectRatio(calculatedAspectRatio);
-            },
-            error => {
-              console.error('Error getting image dimensions:', error);
-            }
-          );
-        }
-    }, [picture]);
+    const [reportBoxVisible, setReportBoxVisible] = useState<boolean>(true);
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -68,6 +54,12 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         });
         props.setReportMachinesModalVisible(false);
     };
+
+    // useEffect(() => {
+    //     if (picture) {
+    //         console.log(picture);
+    //     }
+    // }, [picture]);
 
 
     useEffect(() => {
@@ -94,8 +86,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const handleNext = () => {
         if (step <= 3) {
 
-            
-
             const count = (machineData as MachineData)[machineStepType as MachineType].count;
             const countStatus = (machineData as MachineData)[machineStepType as MachineType].status.length;
 
@@ -116,26 +106,43 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         }; 
     };
 
-    const handleSubmit = () => {
+
+    const uploadImageAndGetURL = async (picture: string) => {
+        try {
+
+            // Get the picture uri as a blob
+            const imageResponse = await fetch(picture);
+            const blob = await imageResponse.blob();
+
+            // Create a reference to the folder online to upload to
+            const imageRef = storageRef(storage, 'reportImages/' + Date.now().toString());
+
+            // Upload the image
+            const snapshot = await uploadBytes(imageRef, blob);
+
+            // Get the URL of the uploaded image
+            const ImageURL = await getDownloadURL(imageRef);
+
+            return ImageURL;
+        } catch (error) {
+            alert("Image can't be uploaded. Please try again later")
+            return ""
+        }
+    }
+
+    const handleSubmit = async () => {
         // Submit the data up to database
 
-        const giveMachineType = "bottle";
-
-        const count = (machineData as MachineData)[giveMachineType as MachineType].count;
-            const countStatus = (machineData as MachineData)[giveMachineType as MachineType].status.length;
-
-        if (count != countStatus) {
-            // Check if a selection has been made, show an alert if not
-            Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
-            return;
-        };
+        // Get the Image URL from firebase
+        const imageUri = await uploadImageAndGetURL(picture as string);
 
         const currentDate = new Date();
 
         const newReview: Review = {
             'user': user?.email as string,
             'date': currentDate.toLocaleDateString(),
-            'machineData': machineData
+            'machineData': machineData,
+            'imageUri': imageUri
         };
 
         const addReviewToLocation = (location: Location | null | undefined) => {
@@ -205,6 +212,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         // Run the function
         addReviewToLocation(props.location);
         setStep(1);
+        setPicture(null);
         setMachineData({
             glass: { count: 0, status: [] },
             can: { count: 0, status: [] },
@@ -246,6 +254,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
 
     const incrementMachineCount = (machineType: MachineType) => {
+        // Increase the machine count and add 1
         const currentMachineData = { ...machineData[machineType] };
         currentMachineData.count += 1;
 
@@ -257,6 +266,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
 
     const decrementMachineCount = (machineType: MachineType) => {
+        // Decrease the machine count and remove the last one
         const currentMachineData = { ...machineData[machineType] };
         currentMachineData.count = Math.max(0, currentMachineData.count - 1);
         
@@ -268,6 +278,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         ...machineData,
         [machineType]: currentMachineData,
         });
+    };
+
+
+    const capitalizeFirstLetter = (string: string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
 
@@ -297,10 +312,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
               </ScrollView>
             </View>
           )
-    };
-
-    const capitalizeFirstLetter = (string: string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
 
@@ -382,11 +393,20 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                             <Text style={styles.closeReportButtonText}>{`<-`}</Text>
                         </TouchableOpacity>
 
-                        <View>
+                        {reportBoxVisible ? (
+                            <View style={styles.reportBoxContainer}>
+                                <ReportBox machineData={machineData} location={null} showReportBoxFooter={false}/>
+                            </View>
+                        ) : null }
+                        
+                        <View style={styles.reportActions}>
 
-                            <ReportBox machineData={machineData} location={null} showReportBoxFooter={false}/>
-
-                            <Text style={styles.confirmationText}>Ready to submit Report?</Text>
+                            <View style={styles.reportConfirmContainer}>
+                                <Text style={styles.confirmationText}>Ready to submit Report?</Text>
+                                <TouchableOpacity style={styles.showReportBoxButton} onPress={() => setReportBoxVisible(!reportBoxVisible)}>
+                                        <Text style={styles.showReportBoxText}>{reportBoxVisible ? ("Hide"): ("Show")}</Text>
+                                </TouchableOpacity>
+                            </View>
 
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
                                 <Text style={styles.nextSubmitText}>Submit Report</Text>
@@ -534,16 +554,42 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700'
     },
+    reportBoxContainer: {
+        flex: 4, 
+        justifyContent: 'flex-end'
+    },
+    reportActions: {
+    },
+    reportConfirmContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginVertical: 20
+    },
     confirmationText: {
         color: 'white',
         fontWeight: "bold",
         fontSize: 20,
         textAlign: 'center',
+        alignSelf: 'center',
         shadowColor: 'black',
         shadowOpacity: 1,
         shadowRadius: 2,
         shadowOffset: { height: 3, width: 0},
-        paddingVertical: 30,
+    },
+    showReportBoxButton: {
+        alignItems: 'center',
+        alignSelf: 'center',
+        alignContent: 'center',
+        backgroundColor: 'orange',
+        padding: 10,
+        borderRadius: 10,
+    },
+    showReportBoxText: {
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 18
     }
 })
 

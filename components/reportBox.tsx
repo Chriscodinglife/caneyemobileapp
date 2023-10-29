@@ -73,34 +73,33 @@ const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
 const styles = StyleSheet.create({
     recentReviewBox: {
-      flex: 1,
-      flexDirection: 'column',
-      backgroundColor: 'white',
-      alignItems: 'center',
-      borderRadius: 10,
-      shadowColor: "black",
-      shadowOpacity: 0.3,
-      shadowRadius: 15,
-      shadowOffset: {width: 0, height: 10},
-      padding: 15,
-      height: '100%',
-      width: '100%'
+        flexDirection: 'column',
+        backgroundColor: 'white',
+        alignItems: 'center',
+        borderRadius: 10,
+        shadowColor: "black",
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
+        shadowOffset: {width: 0, height: 10},
+        padding: 15,
+        height: 240,
+        width: '100%'
     },
     reviewBoxHeader: {
-      alignSelf: 'flex-start',
-      fontSize: 17,
-      fontWeight: '600'
+        alignSelf: 'flex-start',
+        fontSize: 17,
+        fontWeight: '600'
     },
     reviewBoxGoodMachinesView: {
-      flex: 3,
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       width: '100%',
-      height: '130%',
-      marginVertical: 30,
+      height: '80%',
       alignItems: 'center',
       backgroundColor: '#F6F5F1',
-      borderRadius: 20
+      borderRadius: 20,
+      padding: 10,
+      margin: 10
     },
     reportNumber: {
       fontWeight: 'bold',
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
     reviewGlassLeftColumn: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'space-around',
+      justifyContent: 'center',
       gap: 20,
       height: '100%',
       borderRightColor: 'grey',
@@ -123,7 +122,7 @@ const styles = StyleSheet.create({
     reviewCanMiddleColumn: {
       flex: 1,
       alignItems: 'center',
-      justifyContent: 'space-around',
+      justifyContent: 'center',
       gap: 20,
       height: '100%',
       borderRightColor: 'grey',
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     reviewBottleRightColumn: {
       flex: 1, 
       alignItems: 'center',
-      justifyContent: 'space-around',
+      justifyContent: 'center',
       gap: 20,
       height: '100%',
       borderRightColor: 'grey',
@@ -160,17 +159,6 @@ const styles = StyleSheet.create({
       color: 'white',
       fontWeight: '600',
       fontSize: 13
-    },
-    reportButton: {
-      alignItems: 'center',
-      backgroundColor: "#EA2260",
-      borderRadius: 10,
-      padding: 16,
-      marginVertical: 15,
-      shadowColor: "#EA2260",
-      shadowOpacity: 0.5,
-      shadowRadius: 4,
-      shadowOffset: {width: 0, height: 2},
     },
 });
 
