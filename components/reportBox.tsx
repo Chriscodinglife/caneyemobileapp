@@ -60,7 +60,6 @@ const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
                 <LocationReportListModal 
                     location={props.location as Location}
-                    reviews={props?.location?.reviews}
                     isLocationReportListModalVisible={locationReportListModalVisible}
                     closeLocationReportListModal={setLocationReportListModalVisible}/>
                 </>
@@ -94,12 +93,11 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       width: '100%',
-      height: '80%',
+      height: '75%',
       alignItems: 'center',
       backgroundColor: '#F6F5F1',
       borderRadius: 20,
       padding: 10,
-      margin: 10
     },
     reportNumber: {
       fontWeight: 'bold',
@@ -139,11 +137,11 @@ const styles = StyleSheet.create({
       padding: 15
     },
     reportBoxFooter: {
-      flex: 1,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-end',
-      width: '100%'
+      width: '100%',
+      marginTop: 10
     },
     reportBoxDate: {
       fontSize: 13

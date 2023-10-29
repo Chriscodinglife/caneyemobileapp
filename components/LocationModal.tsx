@@ -6,6 +6,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { machineDB, auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
 import { ref, child, update, get } from 'firebase/database';
+import ReportBox from './reportBox';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LocationReportListModal from './LocationReportListModal';
 import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBackground } from 'react-native';
@@ -77,42 +78,11 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
             <View style={styles.reviewActions}>
 
               { numberOfReports > 0 ? ( 
-                <View style={styles.recentReviewBox}>
-
-                  <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
-
-                  <View style={styles.reviewBoxGoodMachinesView}>
-                  
-                    <View style={styles.reviewGlassLeftColumn}>
-                      <Text style={styles.reportNumber}>{goodGlassMachines}</Text>
-                      <Text style={styles.reportNumberText}>Glass</Text>
-                    </View>
-                  
-                    <View style={styles.reviewCanMiddleColumn}>
-                      <Text style={styles.reportNumber}>{goodCanMachines}</Text>
-                      <Text style={styles.reportNumberText}>Can</Text>
-                    </View>
-                  
-                    <View style={styles.reviewBottleRightColumn}>
-                      <Text style={styles.reportNumber}>{goodBottleMachines}</Text>
-                      <Text style={styles.reportNumberText}>Bottle</Text>
-                    </View>
-
-                  </View>
-
-                  <View style={styles.reportBoxFooter}>
-                    <Text style={styles.reportBoxDate}>Posted on {props.location.recentReview?.date}</Text>
-                    <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
-                      <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <LocationReportListModal 
+                <View style={styles.reportBoxContainer}>
+                  <ReportBox
+                    machineData={props.location.recentReview?.machineData as MachineData}
                     location={props.location}
-                    reviews={props.location.reviews}
-                    isLocationReportListModalVisible={locationReportListModalVisible}
-                    closeLocationReportListModal={setLocationReportListModalVisible}/>
-
+                    showReportBoxFooter={true}/>
                 </View>
 
               ) : ( 
@@ -235,6 +205,16 @@ const styles = StyleSheet.create({
       shadowRadius: 3,
       shadowOffset: {width: 0, height: 0},
     },
+    reportConfirmContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginVertical: 20
+  },
+  reportBoxContainer: {
+    flex: 4, 
+    justifyContent: 'flex-start'
+  },
     recentReviewBox: {
       flex: 1,
       flexDirection: 'column',

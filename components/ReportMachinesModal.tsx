@@ -18,7 +18,6 @@ interface ReportMachinesModalProps {
     reportMachinesModalVisible: boolean;
     updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
     setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
-    
 }
 
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {

@@ -1,87 +1,168 @@
 import { Review, MachineStatus, Location } from './Location';
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import ReportBox from './reportBox';
+import React, { useState, Dispatch, SetStateAction, useRef } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Modal, Animated, Dimensions, TouchableWithoutFeedback } from 'react-native';
 
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Modal} from 'react-native';
-
-type LocationReportListModalProps = {
+interface LocationReportListModalProps {
     location: Location;
-    reviews?: Review[];
     isLocationReportListModalVisible: boolean;
     closeLocationReportListModal: Dispatch<SetStateAction<boolean>>;
 }
 
+interface ExtendedReview extends Review {
+  finish: number;
+}
+
+const { width, height } = Dimensions.get('window');
+
+const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: LocationReportListModalProps) => {
+
+  
+	// current is for get the current content is now playing
+	const [current, setCurrent] = useState(0);
+	// if load true then start the animation of the bars at the top
+	const [load, setLoad] = useState(false);
+	// progress is the animation value of the bars content playing the current state
+	const progress = useRef(new Animated.Value(0)).current;
+  const [content, setContent] = useState<ExtendedReview[]>((props.location.reviews as ExtendedReview[]));
+  
+  console.log(props.location.reviews?.length)
+  console.log(content.length);
+
+  console.log(content);
+
+  const start = () => {
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: 8000,
+      useNativeDriver: false
+    }).start(({ finished }) => {
+      if (finished) {
+        next();
+      };
+    });
+  };
 
 
-const LocationReportListModal: React.FC<LocationReportListModalProps> = ({ reviews, closeLocationReportListModal, isLocationReportListModalVisible, location }) => {
+  // handle playing the animation
+  const play = () => {
+		start();
+	};
+
+	// next() is for changing the content of the current content to +1
+  const next = () => {
+		// check if the next content is not empty
+
+		if (current !== (content.length as number) - 1) {
+			let data = [...content];
+			data[current].finish = 1;
+			setContent(data);
+			setCurrent(current + 1);
+			progress.setValue(0);
+			setLoad(false);
+		} else {
+			// the next content is empty
+			close();
+		};
+	};
+
+  // previous() is for changing the content of the current content to -1
+	const previous = () => {
+		// checking if the previous content is not empty
+		if (current - 1 >= 0) {
+			let data = [...content];
+			data[current].finish = 0;
+			setContent(data);
+			setCurrent(current - 1);
+			progress.setValue(0);
+			setLoad(false);
+		} else {
+			// the previous content is empty
+			close();
+		};
+	};
+
+  // closing the modal set the animation progress to 0
+	const close = () => {
+		progress.setValue(0);
+		setLoad(false);
+    setCurrent(0);
+		props.closeLocationReportListModal(false);
+	};
+
   return (
     <Modal
       animationType='slide'
       transparent={false}
-      visible={isLocationReportListModalVisible}
-      onRequestClose={() => closeLocationReportListModal(false)}>
-      <View style={styles.reportsMainView}>
-        
-        <View style={styles.headerBox}>
-          <Text style={styles.mainHeader}>
-            Past Reports for {location.name}
-          </Text>
-        </View>
-        
-        <ScrollView contentContainerStyle={styles.scrollViewContentStyle} style={styles.scrollView}>
-          { reviews?.map( (review, index) => { 
-            
-            const goodGlassMachines = review.machineData?.glass?.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-            const goodCanMachines = review.machineData?.can?.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-            const goodBottleMachines = review.machineData?.bottle?.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-          
-            const numberGlassMachines = review.machineData?.glass.count ?? 0;
-            const numberCanMachines = review.machineData?.can.count ?? 0;
-            const numberBottleMachines = review.machineData?.bottle.count ?? 0;
-          
-          
-            const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
-            const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
-            
-            return ( 
-              <View style={styles.recentReviewBox} key={index}>
-                
-                <View style={styles.reportBoxFooter}>
-                  <Text style={styles.reportBoxDate}>Posted on {review.date}</Text>
-                </View>
+      visible={props.isLocationReportListModalVisible}
+      onRequestClose={() => props.closeLocationReportListModal(false)}>
+        <View style={styles.containerModal}>
 
-                <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
+					<View style={styles.backgroundContainer}>
+            <Image onLoadEnd={() => {
+									progress.setValue(0);
+									play();
+								}}
+								source={{ uri: content[current]?.imageUri as string}}
+								style={styles.reportImage}
+							/>
+					</View>
 
-                <View style={styles.reviewBoxGoodMachinesView}>
-                  
-                  <View style={styles.reviewGlassLeftColumn}>
-                    <Text style={styles.reportNumber}>{goodGlassMachines}</Text>
-                    <Text style={styles.reportNumberText}>Glass</Text>
-                  </View>
-                  
-                  <View style={styles.reviewCanMiddleColumn}>
-                    <Text style={styles.reportNumber}>{goodCanMachines}</Text>
-                    <Text style={styles.reportNumberText}>Can</Text>
-                  </View>
-                  
-                  <View style={styles.reviewBottleRightColumn}>
-                    <Text style={styles.reportNumber}>{goodBottleMachines}</Text>
-                    <Text style={styles.reportNumberText}>Bottle</Text>
-                  </View>
+					<View style={styles.reportInteractions}>
 
-                </View>
+						{/* ANIMATION BARS */}
+						<View style={styles.animationBars}>
+							{content.map((index, key) => {
+								return (
+									// THE BACKGROUND
+									<View key={key} style={styles.animationBarsBackground} >
+                    {/* THE ANIMATION OF THE BAR*/}
+                    <Animated.View
+											style={{
+												flex: current == key ? progress : content[key].finish,
+												height: 2,
+												backgroundColor: 'rgba(255, 255, 255, 1)',
+											}}/>
+									</View>
+								);
+							})}
+						</View>
 
-                
+						{/* END OF ANIMATION BARS */}
 
-              </View>
-            )
-          })}
-        </ScrollView>
+						<View style={styles.reportImageHeader}>
+							{/* THE AVATAR AND USERNAME  */}
+							<View style={styles.reportHeaderDate}>
+								<Text style={styles.reportHeaderDateText}>
+									Posted on {content[current]?.date}
+								</Text>
+							</View>
+							{/* END OF THE AVATAR AND USERNAME */}
 
-        <TouchableOpacity style={styles.closeButton} onPress={() => closeLocationReportListModal(false)}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
+							{/* THE CLOSE BUTTON */}
+							<TouchableOpacity onPress={() => close()}>
+								<View style={styles.closeButtonStyle}>
+									<Ionicons name="ios-close" size={28} color="white" />
+								</View>
+							</TouchableOpacity>
+							{/* END OF CLOSE BUTTON */}
+						</View>
 
-      </View>
+						{/* HERE IS THE HANDLE FOR PREVIOUS AND NEXT PRESS */}
+						<View style={styles.leftRightPressStyle}>
+							<TouchableWithoutFeedback onPress={() => previous()}>
+								<View style={{ flex: 1 }}></View>
+							</TouchableWithoutFeedback>
+							<TouchableWithoutFeedback onPress={() => next()}>
+								<View style={{ flex: 1 }}></View>
+							</TouchableWithoutFeedback>
+						</View>
+						{/* END OF THE HANDLE FOR PREVIOUS AND NEXT PRESS */}
+
+					</View>
+				</View>
     </Modal>
   )
 };
@@ -93,6 +174,63 @@ const styles = StyleSheet.create({
     backgroundColor: "#1648FA",
     padding: 30,
     justifyContent: 'space-between',
+  },
+  reportImage: { 
+    width: width, 
+    height: height, 
+    resizeMode: 'cover'
+  },
+  reportInteractions: {
+    flexDirection: 'column',
+    flex: 1,
+  },
+  headerGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 100,
+  },
+  animationBars: {
+    flexDirection: 'row',
+    paddingTop: 80,
+    paddingHorizontal: 10,
+  },
+  animationBarsBackground: {
+    height: 2,
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(117, 117, 117, 0.5)',
+    marginHorizontal: 2,
+  },
+  animatingTheBars: {
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+  },
+  reportImageHeader: {
+    height: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
+  },
+  reportHeaderDate: { 
+    flexDirection: 'row',
+     alignItems: 'center' 
+  },
+  reportHeaderDateText: {
+    fontWeight: 'bold',
+    color: 'white',
+    paddingLeft: 10,
+  },
+  closeButtonStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    paddingHorizontal: 15,
+  },
+  leftRightPressStyle: { 
+    flex: 1, 
+    flexDirection: 'row' 
   },
     headerBox: {
         alignItems: 'flex-start',
@@ -198,7 +336,25 @@ const styles = StyleSheet.create({
       color: 'black',
       fontSize: 20,
       fontWeight: '700'
-    }
+    },
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    containerModal: {
+      flex: 1,
+      backgroundColor: '#000',
+    },
+    backgroundContainer: {
+      position: 'absolute',
+  
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
   });
 
 export default LocationReportListModal
