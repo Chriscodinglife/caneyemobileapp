@@ -79,35 +79,41 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
               { numberOfReports > 0 ? ( 
                 <View style={styles.recentReviewBox}>
 
-                <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
+                  <Text style={styles.reviewBoxHeader}>{`🥫 ${goodMachinesCount} out of ${totalMachineCount} machines are good`}</Text>
 
-                <View style={styles.reviewBoxGoodMachinesView}>
+                  <View style={styles.reviewBoxGoodMachinesView}>
                   
-                  <View style={styles.reviewGlassLeftColumn}>
-                    <Text style={styles.reportNumber}>{goodGlassMachines}</Text>
-                    <Text style={styles.reportNumberText}>Glass</Text>
-                  </View>
+                    <View style={styles.reviewGlassLeftColumn}>
+                      <Text style={styles.reportNumber}>{goodGlassMachines}</Text>
+                      <Text style={styles.reportNumberText}>Glass</Text>
+                    </View>
                   
-                  <View style={styles.reviewCanMiddleColumn}>
-                    <Text style={styles.reportNumber}>{goodCanMachines}</Text>
-                    <Text style={styles.reportNumberText}>Can</Text>
-                  </View>
+                    <View style={styles.reviewCanMiddleColumn}>
+                      <Text style={styles.reportNumber}>{goodCanMachines}</Text>
+                      <Text style={styles.reportNumberText}>Can</Text>
+                    </View>
                   
-                  <View style={styles.reviewBottleRightColumn}>
-                    <Text style={styles.reportNumber}>{goodBottleMachines}</Text>
-                    <Text style={styles.reportNumberText}>Bottle</Text>
+                    <View style={styles.reviewBottleRightColumn}>
+                      <Text style={styles.reportNumber}>{goodBottleMachines}</Text>
+                      <Text style={styles.reportNumberText}>Bottle</Text>
+                    </View>
+
                   </View>
+
+                  <View style={styles.reportBoxFooter}>
+                    <Text style={styles.reportBoxDate}>Posted on {props.location.recentReview?.date}</Text>
+                    <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
+                      <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <LocationReportListModal 
+                    location={props.location}
+                    reviews={props.location.reviews}
+                    isLocationReportListModalVisible={locationReportListModalVisible}
+                    closeLocationReportListModal={setLocationReportListModalVisible}/>
 
                 </View>
-
-                <View style={styles.reportBoxFooter}>
-                  <Text style={styles.reportBoxDate}>Posted on {props.location.recentReview?.date}</Text>
-                  <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
-                    <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
-                  </TouchableOpacity>
-                </View>
-
-              </View>
 
               ) : ( 
                 <>
@@ -164,11 +170,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
             </View>
 
         </View>
-        <LocationReportListModal 
-          location={props.location}
-          reviews={props.location.reviews}
-          isLocationReportListModalVisible={locationReportListModalVisible}
-          closeLocationReportListModal={setLocationReportListModalVisible}/>
+        
       </Modal>
   )
 }

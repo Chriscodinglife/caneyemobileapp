@@ -5,7 +5,7 @@ import { useAppContext } from './AppContextProvider';
 import CameraModal from './CameraModal';
 import { ref, child, update, get, set } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions} from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 
 
@@ -18,6 +18,9 @@ interface ReportMachinesModalProps {
     setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
     
 }
+
+const win = Dimensions.get('screen');
+
 
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
   
@@ -46,9 +49,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
           );
         }
     }, [picture]);
-
-
-
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -95,6 +95,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const handleNext = () => {
         if (step <= 3) {
 
+            
+
             const count = (machineData as MachineData)[machineStepType as MachineType].count;
             const countStatus = (machineData as MachineData)[machineStepType as MachineType].status.length;
 
@@ -108,11 +110,14 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             }
         };
 
+        console.log("Step is: " + step);
         setStep(step + 1);
         if (step === 4) {
             setCameraModalVisible(true);
         }; 
     };
+
+    console.log("Step is: " + step);
 
 
     const handleSubmit = () => {
@@ -309,39 +314,36 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         transparent={false}
         visible={props.reportMachinesModalVisible}
         onRequestClose={() => handleClose()}
+        statusBarTranslucent
         >
-            <View style={styles.mainView}>
 
-                <View style={styles.headerBox}>
-                    {step === 1 || step === 2 || step === 3 ? (
-                        
-                        <>
-                            <View> 
-                            <TouchableOpacity onPress={() => handleClose()}>
-                                <Text style={styles.closeButtonText}>{`<-`}</Text>
-                            </TouchableOpacity>
-                                <Text style={styles.mainHeader}>
-                                    {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
-                                </Text>
-                                <Text style={styles.subMainHeader}>
-                                    How many{' '}{step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'} recycling machines are here at {props.location.name}?
-                                </Text>
-                            </View>
-                            
-                        </>
+            {step < 5 ? (
 
-                    ) : step === 4 ? (
+                <View style={styles.mainView}>
 
-                        <>
-                        <CameraModal
-                            setPicture={setPicture}
-                            handleNext={handleNext}
-                            isCameraModalVisible={isCameraModalVisible} 
-                            setCameraModalVisible={setCameraModalVisible}/>
-                        </>
+                {step === 1 || step === 2 || step === 3 ? (
+                    <View style={styles.headerBox}>
+                        <View> 
+                        <TouchableOpacity onPress={() => handleClose()}>
+                            <Text style={styles.closeButtonText}>{`<-`}</Text>
+                        </TouchableOpacity>
+                            <Text style={styles.mainHeader}>
+                                {step === 1 ? 'Glass' : step === 2 ? 'Can' : 'Bottle'} Recycling Machines
+                            </Text>
+                            <Text style={styles.subMainHeader}>
+                                How many{' '}{step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'} recycling machines are here at {props.location.name}?
+                            </Text>
+                        </View>
+                    </View>
+                ) : step === 4 ? (
+                    <CameraModal
+                        setPicture={setPicture}
+                        handleNext={handleNext}
+                        isCameraModalVisible={isCameraModalVisible} 
+                        setCameraModalVisible={setCameraModalVisible}/>
 
-                    ) : null}
-                </View>
+                ) : null}
+
 
                 {step === 1 || step === 2 || step === 3 ? (
                     <>
@@ -349,58 +351,53 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                     </>
                 ) : null}
 
-                <View>
-                    {step === 1 || step === 2 || step === 3 ? (
-                        <>
-                            <View style={styles.addButtonsBox}>
-                                <View style={styles.minusButton}>
-                                    <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
-                                </View>
-                                    <Text style={styles.machineCounter}>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
-                                <View style={styles.addButton}>
-                                    <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
-                                </View>    
+                {step === 1 || step === 2 || step === 3 ? (
+                        <View style={styles.addButtonsBox}>
+                            <View style={styles.minusButton}>
+                                <Button title="➖" onPress={() => decrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
                             </View>
-                        </>
-                    ) : null}
+                                <Text style={styles.machineCounter}>{machineData[step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle'].count}</Text>
+                            <View style={styles.addButton}>
+                                <Button title="➕" onPress={() => incrementMachineCount(step === 1 ? 'glass' : step === 2 ? 'can' : 'bottle')} />
+                            </View>    
+                        </View>
+                ) : null}
 
-                    {step === 1 || step === 2 || step === 3 ? (
-                        
-                        <>
-                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleNext}>
-                                <Text style={styles.nextSubmitText}>Next</Text>
-                            </TouchableOpacity>
-                        </>
+                {step === 1 || step === 2 || step === 3 ? (
+                    
+                    <>
+                        <TouchableOpacity style={styles.nextSubmitButton} onPress={handleNext}>
+                            <Text style={styles.nextSubmitText}>Next</Text>
+                        </TouchableOpacity>
+                    </>
 
-                    ) : step === 4 ? (
+                ) : null}
 
-                        <>
-                        </>
-
-                    ) : null}
                 </View>
 
-            </View>
-
-        {step === 5 ? (
-            <View style={styles.submitReportCheckView}>
-
-                <ImageBackground style={styles.imageTaken} source={{ uri: picture as string}} resizeMode='cover'>
-                    <View style={styles.imageBGFlexBox}>
-                        <TouchableOpacity onPress={() => handleClose()}>
-                            <Text style={styles.closeButtonText}>{`<-`}</Text>
+            ) : null }
+            
+            {step === 5 ? (
+                <View style={styles.submitReportCheckView}>
+                    
+                    <ImageBackground style={styles.previewImage} source={{ uri: picture as string}}>
+                    
+                        <TouchableOpacity style={styles.closeButtonReportStep} onPress={() => handleClose()}>
+                            <Text style={styles.closeReportButtonText}>{`<-`}</Text>
                         </TouchableOpacity>
 
-                            <Text>Ready to submit Report?</Text>
+                        <View>
+                            <Text style={styles.confirmationText}>Ready to submit Report?</Text>
 
-                        <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
-                            <Text style={styles.nextSubmitText}>Submit Report</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ImageBackground>
+                            <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
+                                <Text style={styles.nextSubmitText}>Submit Report</Text>
+                            </TouchableOpacity>
+                        </View>
 
-            </View>
-        ): null}
+                    </ImageBackground>
+
+                </View>
+            ): null}
             
         </Modal>
     );
@@ -417,17 +414,14 @@ const styles = StyleSheet.create({
     submitReportCheckView: {
         flex: 1,
     },    
-    imageTaken: {
-        height: undefined, 
-        width: '100%',
+    previewImage: {
         flex: 1,
-    },
-    imageBGFlexBox: {
-        flex: 1,
-        flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: 30
+        padding: 30,
 
+    },
+    closeButtonReportStep: {
+        paddingVertical: 30,
     },
     closeButtonText: {
         color: 'grey',
@@ -437,6 +431,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 2,
         shadowOffset: { height: 0, width: 0},
+        paddingVertical: 30
+    },
+    closeReportButtonText: {
+        color: 'white',
+        fontWeight: "bold",
+        fontSize: 20,
+        shadowColor: 'black',
+        shadowOpacity: 1,
+        shadowRadius: 2,
+        shadowOffset: { height: 3, width: 0},
         paddingVertical: 30
     },
     headerBox: {
@@ -530,6 +534,17 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 20,
         fontWeight: '700'
+    },
+    confirmationText: {
+        color: 'white',
+        fontWeight: "bold",
+        fontSize: 20,
+        textAlign: 'center',
+        shadowColor: 'black',
+        shadowOpacity: 1,
+        shadowRadius: 2,
+        shadowOffset: { height: 3, width: 0},
+        paddingVertical: 30,
     }
 })
 
