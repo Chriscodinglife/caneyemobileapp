@@ -5,11 +5,11 @@ import { useAppContext } from './AppContextProvider';
 import CameraModal from './CameraModal';
 import { ref, child, update, get, set } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
-import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar} from 'react-native';
+import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar, ActivityIndicator} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 import ReportBox from './reportBox';
 import { storage } from '../firebaseConfig';
-import { getDownloadURL, ref as storageRef, uploadBytes, uploadString } from 'firebase/storage';
+import { getDownloadURL, ref as storageRef, uploadBytes, uploadString, uploadBytesResumable } from 'firebase/storage';
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
@@ -30,6 +30,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     const [isCameraModalVisible, setCameraModalVisible] = useState<boolean>(false);
     const [machineStepType, setMachineStepType] = useState<string>('glass');
     const [reportBoxVisible, setReportBoxVisible] = useState<boolean>(true);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     // Track the machine data for this report
     const [machineData, setMachineData] = useState<MachineData>({
@@ -106,36 +107,31 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
     };
 
 
-    const uploadImageAndGetURL = async (picture: string) => {
-        try {
-
-            // Get the picture uri as a blob
-            const imageResponse = await fetch(picture);
-            const blob = await imageResponse.blob();
-
-            // Create a reference to the folder online to upload to
-            const imageRef = storageRef(storage, 'reportImages/' + Date.now().toString());
-
-            // Upload the image
-            const snapshot = await uploadBytes(imageRef, blob);
-
-            // Get the URL of the uploaded image
-            const ImageURL = await getDownloadURL(imageRef);
-
-            return ImageURL;
-        } catch (error) {
-            alert("Image can't be uploaded. Please try again later");
-            return "";
-        }
-    }
-
     const handleSubmit = async () => {
         // Submit the data up to database
 
-        // Get the Image URL from firebase
-        const imageUri = await uploadImageAndGetURL(picture as string);
+        setIsUploading(true);
 
         const currentDate = new Date();
+
+        // Get the Image URL from firebase
+        const blob = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+              resolve(xhr.response);
+            };
+            xhr.onerror = function (e) {
+              reject(new TypeError("Network request failed"));
+            };
+            xhr.responseType = "blob";
+            xhr.open("GET", picture as string, true);
+            xhr.send(null);
+        });
+
+        const imageRef = storageRef(storage, 'reportImages/' + currentDate.toString() + props.placeID);
+        const metadata = {contentType: 'image/jpeg'};
+        const uploadTask = await uploadBytesResumable(imageRef, blob as Blob, metadata);
+        const imageUri = await getDownloadURL(imageRef);
 
         const newReview: Review = {
             'user': user?.email as string,
@@ -144,6 +140,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             'imageUri': imageUri
         };
 
+        console.log("Starting Location add")
         const addReviewToLocation = (location: Location | null | undefined) => {
 
             if (!location) {
@@ -221,6 +218,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             bottle: { count: 0, status: [] },
         });
         props.setReportMachinesModalVisible(false);
+
+        setIsUploading(false);
         
     };
 
@@ -409,10 +408,15 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                                         <Text style={styles.showReportBoxText}>{reportBoxVisible ? ("Hide"): ("Show")}</Text>
                                 </TouchableOpacity>
                             </View>
-
+                            
+                            {!isUploading ? (
                             <TouchableOpacity style={styles.nextSubmitButton} onPress={handleSubmit}>
                                 <Text style={styles.nextSubmitText}>Submit Report</Text>
                             </TouchableOpacity>
+                            ) : (
+                            <ActivityIndicator size={"large"} color={'white'}/>
+                            )}
+
                         </View>
 
                     </ImageBackground>
@@ -439,7 +443,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between',
         padding: 30,
-
     },
     closeButtonReportStep: {
         paddingVertical: 30,
