@@ -24,7 +24,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
   
   const { user, updateUser } = useAppContext();
   const [loginModalVisible, setLoginModalVisible] = useState(false);
-  const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false)
+  const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
 
   const goodGlassMachines = props.location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
