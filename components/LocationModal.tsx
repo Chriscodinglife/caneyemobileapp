@@ -38,6 +38,9 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
 
   const numberOfReports = props.location.reviews?.length ?? 0
 
+  const lastReviewPosition = props.location.reviews?.length as number - 1;
+
+  const lastReviewMachinedata = props.location.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
 
   const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
   const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
@@ -80,7 +83,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
               { numberOfReports > 0 ? ( 
                 <View style={styles.reportBoxContainer}>
                   <ReportBox
-                    machineData={props.location.recentReview?.machineData as MachineData}
+                    machineData={lastReviewMachinedata}
                     location={props.location}
                     showReportBoxFooter={true}/>
                 </View>

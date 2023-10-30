@@ -4,7 +4,7 @@ import { MachineStatus, MachineData, Location } from './Location';
 import LocationReportListModal from './LocationReportListModal';
 
 interface ReportBoxProps {
-    machineData: MachineData;
+    machineData: MachineData | undefined;
     location: Location | null;
     showReportBoxFooter: boolean;
 }

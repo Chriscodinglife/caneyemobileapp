@@ -1,6 +1,6 @@
 import { Review, MachineStatus, Location } from './Location';
 import ReportBox from './reportBox';
-import React, { useState, Dispatch, SetStateAction, useRef } from 'react';
+import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Modal, Animated, Dimensions, TouchableWithoutFeedback } from 'react-native';
@@ -11,27 +11,25 @@ interface LocationReportListModalProps {
     closeLocationReportListModal: Dispatch<SetStateAction<boolean>>;
 }
 
-interface ExtendedReview extends Review {
-  finish: number;
-}
-
 const { width, height } = Dimensions.get('window');
 
 const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: LocationReportListModalProps) => {
 
+  useEffect(() => {
+
+    if (props.location.reviews) {
+      setContent(props.location.reviews);
+    };
+
+  },[props.location])
+
   
 	// current is for get the current content is now playing
 	const [current, setCurrent] = useState(0);
-	// if load true then start the animation of the bars at the top
-	const [load, setLoad] = useState(false);
 	// progress is the animation value of the bars content playing the current state
 	const progress = useRef(new Animated.Value(0)).current;
-  const [content, setContent] = useState<ExtendedReview[]>((props.location.reviews as ExtendedReview[]));
-  
-  console.log(props.location.reviews?.length)
-  console.log(content.length);
+  const [content, setContent] = useState<Review[]>((props.location.reviews as Review[]));
 
-  console.log(content);
 
   const start = () => {
     Animated.timing(progress, {
@@ -61,7 +59,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 			setContent(data);
 			setCurrent(current + 1);
 			progress.setValue(0);
-			setLoad(false);
 		} else {
 			// the next content is empty
 			close();
@@ -77,7 +74,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 			setContent(data);
 			setCurrent(current - 1);
 			progress.setValue(0);
-			setLoad(false);
 		} else {
 			// the previous content is empty
 			close();
@@ -87,7 +83,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
   // closing the modal set the animation progress to 0
 	const close = () => {
 		progress.setValue(0);
-		setLoad(false);
     setCurrent(0);
 		props.closeLocationReportListModal(false);
 	};
@@ -162,6 +157,12 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 						{/* END OF THE HANDLE FOR PREVIOUS AND NEXT PRESS */}
 
 					</View>
+          <View style={styles.reportBoxContainer}>
+              <ReportBox
+                machineData={content[current]?.machineData}
+                location={props.location}
+                showReportBoxFooter={false}/>
+            </View>
 				</View>
     </Modal>
   )
@@ -229,8 +230,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   leftRightPressStyle: { 
+    flex: 1,
+    flexDirection: 'row', 
+  },
+  reportBoxContainer: {
     flex: 1, 
-    flexDirection: 'row' 
+    justifyContent: 'flex-end',
+    padding: 30
   },
     headerBox: {
         alignItems: 'flex-start',
