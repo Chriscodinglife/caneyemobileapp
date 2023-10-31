@@ -14,9 +14,28 @@ interface LocationListModalProps {
 };
 
 const LocationListModal: React.FC<LocationListModalProps> = (props: LocationListModalProps) => {
-  const [selectedLocationIndex, setSelectedLocationIndex] = useState<number | null>(null);
-  const [selectedPlaceID, setSelectedPlaceID] = useState<string | null>(null);
+
+  // Make a blank location so we can use this later
+  const blankLocation: Location = {
+    name: "",
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+    numMachines: 0,
+    address: "",
+    placeID: "",
+    imageURL: "",
+  }
+
+  const [selectedLocation, setSelectedLocation] = useState<Location>(blankLocation);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
+
+  const handleSelectedLocation = (location: Location) => {
+    // Handle the selected Marker by setting the Location selected and making the modal visible
+    setSelectedLocation(location);
+    setLocationModalVisible(true);
+  }
 
 
   const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
@@ -25,7 +44,10 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
   };
 
   const renderScrollView = () => {
-    for (const placeID in props.locations) {
+
+    const scrollItems = []
+
+    for (let placeID in props.locations) {
       const location = props.locations[placeID];
       const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
       const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
@@ -39,9 +61,9 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
       const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
       const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
       
-      return (
+      scrollItems.push(
             <View key={placeID} style={styles.locationItem}>
-              <TouchableOpacity style={styles.locationContent} onPress={() => setLocationModalVisible(true)}>
+              <TouchableOpacity style={styles.locationContent} onPress={() => handleSelectedLocation(location)}>
                 <Image style={styles.locationImage} source={{uri: location.imageURL}}/>
                 <View style={styles.locationDetails}>
                   <Text style={styles.locationName}>{location.name}</Text>
@@ -58,6 +80,8 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
             </View>
         )
       };
+
+      return scrollItems;
   };
 
   

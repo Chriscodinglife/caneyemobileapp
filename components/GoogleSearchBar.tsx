@@ -75,7 +75,7 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarP
           }}
           fetchDetails={true}
           textInputProps={{
-            placeholderTextColor: 'white', // Text color
+            placeholderTextColor: 'black', // Text color
             style: searchBarStyle.searchBarStyle
           }}
           query={{
@@ -116,8 +116,8 @@ const searchBarStyle = StyleSheet.create({
     searchBarStyle: {
       flex: 1,
       justifyContent: 'center',
-      color: 'white', // Text color
-      backgroundColor: '#53E601', // Background color
+      color: 'black', // Text color
+      backgroundColor: 'white', // Background color
       borderRadius: 20, // Rounded edges
       marginHorizontal: 30,
       padding: 20, // Add padding to the input

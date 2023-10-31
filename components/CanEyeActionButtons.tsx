@@ -3,11 +3,11 @@ import { View, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; 
 
 
-type AddButtonProps = {
+interface CanEyeActionButtonsProps {
     onClick: () => void;
 };
 
-const AddButton: React.FC<AddButtonProps> = ({ onClick }) => {
+const CanEyeActionButtons: React.FC<CanEyeActionButtonsProps> = ({ onClick }) => {
     const [buttonPressed, setButtonPressed] = useState(false);
 
     const inPressButton = () => {
@@ -54,4 +54,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AddButton;
+export default CanEyeActionButtons;
