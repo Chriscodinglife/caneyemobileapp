@@ -16,6 +16,7 @@ export type Review = {
   message?: string;
   imageUri?: string | null;
   machineData?: MachineData
+  finish?: number
 }
 
 export type Location = {
