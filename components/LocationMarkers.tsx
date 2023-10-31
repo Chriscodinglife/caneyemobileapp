@@ -1,10 +1,8 @@
 import { Location } from './Location';
 import React, { useState, Dispatch, SetStateAction } from 'react';
 import LocationModal from './LocationModal';
-import { Marker, Callout } from 'react-native-maps';
-import { View, Text, StyleSheet, Modal, Button, Image } from 'react-native';
-import { setLogLevel } from 'firebase/app';
-import { update } from 'firebase/database';
+import { Marker } from 'react-native-maps';
+import { View, StyleSheet } from 'react-native';
 
 interface LocationMarkersProps {
   locations: { [placeID: string]: Location } | undefined;
@@ -12,7 +10,21 @@ interface LocationMarkersProps {
 };
 
 const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersProps) => {
-  const [selectedPlaceID, setSelectedPlaceID] = useState<string | null>(null);
+
+  // Make a blank location so we can use this later
+  const blankLocation: Location = {
+    name: "",
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+    numMachines: 0,
+    address: "",
+    placeID: "",
+    imageURL: "",
+  }
+
+  const [selectedLocation, setSelectedLocation] = useState<Location>(blankLocation);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
 
   const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
@@ -20,30 +32,42 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
 
   };
 
-  const renderMarkersAndLocationModals = () => {
-    for (const placeID in props.locations) {
-      const location = props.locations[placeID];
-      return (
+  const handleSelectedMarker = (location: Location) => {
+    // Handle the selected Marker by setting the Location selected and making the modal visible
+    setSelectedLocation(location);
+    setLocationModalVisible(true);
+  }
+
+  const renderMarkers = () => {
+    // Render all the locations in the database
+    const markerModals = [];
+
+    for (let placeID in props.locations) {
+      let location = props.locations[placeID];
+      markerModals.push(
         <View key={placeID}>
           <Marker
             coordinate={location.location}
             style={styles.marker}
             title={location.name}
-            onPress={() => setLocationModalVisible(true)}/>
-          <LocationModal 
-            placeID={placeID}
-            location={location}
+            onPress={() => handleSelectedMarker(location)}/>
+            <LocationModal 
+            placeID={selectedLocation.placeID}
+            location={selectedLocation}
             isLocationModalVisible={isLocationModalVisible}
             setLocationModalVisible={setLocationModalVisible}
             updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
         </View>
       );
     };
+
+    return markerModals;
   };
 
   return (
     <>
-    {renderMarkersAndLocationModals()}
+    {renderMarkers()}
+    
     </>
   );
 

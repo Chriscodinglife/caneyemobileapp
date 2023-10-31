@@ -1,15 +1,12 @@
 import LoginModal from './LoginModal';
-import { Location, MachineData, Review, MachineStatus } from './Location';
-import ThumbsDownModal from './thumbsDownModal';
+import { Location} from './Location';
 import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { machineDB, auth } from '../firebaseConfig';
+import { auth } from '../firebaseConfig';
 import { useAppContext } from './AppContextProvider';
-import { ref, child, update, get } from 'firebase/database';
-import ReportBox from './reportBox';
+import ReportBoxWithListOption from './reportBoxWithListOption';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import LocationReportListModal from './LocationReportListModal';
-import { View, Text, StyleSheet, Modal, Button, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ImageBackground } from 'react-native';
 import ReportMachinesModal from './ReportMachinesModal';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
@@ -25,25 +22,12 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
   
   const { user, updateUser } = useAppContext();
   const [loginModalVisible, setLoginModalVisible] = useState(false);
-  const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
 
-  const goodGlassMachines = props.location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-  const goodCanMachines = props.location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-  const goodBottleMachines = props.location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-
-  const numberGlassMachines = props.location.recentReview?.machineData?.glass.count ?? 0;
-  const numberCanMachines = props.location.recentReview?.machineData?.can.count ?? 0;
-  const numberBottleMachines = props.location.recentReview?.machineData?.bottle.count ?? 0;
-
-  const numberOfReports = props.location.reviews?.length ?? 0
-
+  const numberOfReports = props.location?.reviews?.length ?? 0;
   const lastReviewPosition = props.location.reviews?.length as number - 1;
-
   const lastReviewMachinedata = props.location.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
 
-  const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
-  const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
 
   // Listen to state changes of the user and pass that along as needed
   useEffect(() => {
@@ -82,7 +66,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
 
               { numberOfReports > 0 ? ( 
                 <View style={styles.reportBoxContainer}>
-                  <ReportBox
+                  <ReportBoxWithListOption
                     machineData={lastReviewMachinedata}
                     location={props.location}
                     showReportBoxFooter={true}/>

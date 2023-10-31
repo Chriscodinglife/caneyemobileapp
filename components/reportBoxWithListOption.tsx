@@ -9,7 +9,7 @@ interface ReportBoxProps {
     showReportBoxFooter: boolean;
 }
 
-const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
+const ReportBoxWithListOption: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
     const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
 
@@ -48,6 +48,22 @@ const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
                 </View>
 
             </View>
+
+            { props.showReportBoxFooter ? (
+                <>
+                <View style={styles.reportBoxFooter}>
+                    <Text style={styles.reportBoxDate}>Posted on {props?.location?.recentReview?.date}</Text>
+                    <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
+                        <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <LocationReportListModal 
+                    location={props.location as Location}
+                    isLocationReportListModalVisible={locationReportListModalVisible}
+                    closeLocationReportListModal={setLocationReportListModalVisible}/>
+                </>
+            ) : null }
 
         </View>
     );
@@ -144,4 +160,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ReportBox;
+export default ReportBoxWithListOption;
