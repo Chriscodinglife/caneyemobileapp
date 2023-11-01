@@ -10,6 +10,9 @@ import ReportBoxMachineData from './reportBoxMachineData';
 import { storage } from '../firebaseConfig';
 import { getDownloadURL, ref as storageRef, uploadBytes, uploadString, uploadBytesResumable } from 'firebase/storage';
 import { AuthContext } from './AuthContext';
+import blueBackgroundImage from '../assets/bluebackground.jpg';
+
+
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
@@ -118,9 +121,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         let newReview: Review = {
             user: "",
             date: "",
-            imageUri: ""
         }
-
+        
         if (picture) {
             // Get the Image URL from firebase
             const blob = await new Promise((resolve, reject) => {
@@ -147,14 +149,14 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                 'machineData': machineData,
                 'imageUri': imageUri
             };
+        } else {
+            newReview = {
+                'user': currentUser?.email as string,
+                'date': currentDate.toLocaleDateString(),
+                'machineData': machineData,
+                "imageUri": blueBackgroundImage
+            };
         };
-
-        newReview = {
-            'user': currentUser?.email as string,
-            'date': currentDate.toLocaleDateString(),
-            'machineData': machineData
-        };
-
 
         const addReviewToLocation = async (location: Location | null | undefined) => {
 

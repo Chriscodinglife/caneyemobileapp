@@ -4,7 +4,6 @@ import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 're
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Modal, Animated, Dimensions, TouchableWithoutFeedback } from 'react-native';
-
 interface LocationReportListModalProps {
     location: Location;
     isLocationReportListModalVisible: boolean;
@@ -22,8 +21,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
     };
 
   },[props.location])
-
-  console.log(props.location.imageURL);
 
   
 	// current is for get the current content is now playing
@@ -44,7 +41,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
       };
     });
   };
-
 
   // handle playing the animation
   const play = () => {
@@ -98,14 +94,24 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
         <View style={styles.containerModal}>
 
 					<View style={styles.backgroundContainer}>
-            { props.location.imageURL ? (<Image onLoadEnd={() => {
-									progress.setValue(0);
-									play();
-								}}
-								source={{ uri: content[current]?.imageUri as string}}
-								style={styles.reportImage} />
+            { content[current]?.imageUri ? (
+              <>
+              <Image onLoadEnd={() => {
+                progress.setValue(0);
+                play();
+                }}
+                source={{ uri: content[current]?.imageUri as string}}
+                style={styles.reportImage} />
+                </>
             ) : (
-              <View style={styles.reportImageBlank}/>
+              <>
+                <Image onLoadEnd={() => {
+                  progress.setValue(0);
+                  play();
+                  }}
+                  source={require('../assets/bluebackground.jpg')}
+                  style={styles.reportImage} /> 
+                  </>
             )}
             
 					</View>

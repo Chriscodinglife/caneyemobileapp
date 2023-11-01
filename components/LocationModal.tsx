@@ -22,7 +22,6 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
   const { currentUser } = useContext(AuthContext)
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
-  const [numberOfReports, setNumberOfReports] = useState<number>(props.location.reviews?.length ?? 0)
 
   return (
       <Modal
@@ -50,7 +49,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
 
             <View style={styles.reviewActions}>
 
-              { numberOfReports as number > 0 ? ( 
+              { props.location.reviews?.length as number > 0 ? ( 
                 <View style={styles.reportBoxContainer}>
                   <ReportBoxWithListOption
                     location={props.location}
