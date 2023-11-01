@@ -1,14 +1,12 @@
 import LoginModal from './LoginModal';
 import { Location} from './Location';
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
-import { useAppContext } from './AppContextProvider';
+import React, { useState, useEffect, Dispatch, SetStateAction, useContext } from 'react';
 import ReportBoxWithListOption from './reportBoxWithListOption';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ImageBackground } from 'react-native';
 import ReportMachinesModal from './ReportMachinesModal';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { AuthContext } from './AuthContext'
 
 interface LocationModalProps {
   placeID: string | null;
@@ -20,22 +18,20 @@ interface LocationModalProps {
 
 const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) => {
   
-  const { user, updateUser } = useAppContext();
+  const { currentUser } = useContext(AuthContext)
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
+
+  // Check if the current user exists on the initial render.
+  useEffect(() => {
+    if (currentUser !== null) {
+      console.log("Well hello there muthafucka")
+    }
+  }, [currentUser])
 
   const numberOfReports = props.location?.reviews?.length ?? 0;
   const lastReviewPosition = props.location.reviews?.length as number - 1;
   const lastReviewMachinedata = props.location.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
-
-
-  // Listen to state changes of the user and pass that along as needed
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      updateUser(user);
-    });
-
-  }, []);
 
 
   return (
@@ -74,7 +70,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
 
               ) : ( 
                 <>
-                {user ? (
+                {currentUser ? (
                   <View style={styles.recentReviewBox}>
                     <TouchableOpacity style={styles.noReviewsContainer} onPress={() => setReportMachinesModalVisible(true)}>
                       <MaterialCommunityIcons name="alert-decagram" size={60} color="red" />
@@ -95,7 +91,7 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
               
 
               <View>
-                { user ? (
+                { currentUser ? (
                   <>
                     <View>
                       <TouchableOpacity style={styles.reportButton} onPress={() => setReportMachinesModalVisible(true)}>

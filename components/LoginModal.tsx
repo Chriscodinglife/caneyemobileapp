@@ -1,6 +1,5 @@
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
-import { auth } from '../firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, } from "firebase/auth";
+import React, { useState, Dispatch, SetStateAction } from 'react';
+import { signInUser, createUser } from '../firebase/firebase';
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal, TouchableOpacity, Image, Platform, TouchableWithoutFeedback, Keyboard, } from 'react-native';
 
 type LoginModalProps = {
@@ -17,7 +16,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
       setLoading(true);
       
       try {
-        const response = await signInWithEmailAndPassword(auth, email, password);
+        const response = await signInUser(email, password);
         console.log(response);
         alert("You have successfully signed in!")
         setLoginModalVisible(false);
@@ -34,7 +33,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
       setLoading(true);
 
       try {
-        const response = await createUserWithEmailAndPassword(auth, email, password);
+        const response = await createUser(email, password);
         console.log(response);
         alert("Check your email to verify your account.")
       } catch (error: any) {

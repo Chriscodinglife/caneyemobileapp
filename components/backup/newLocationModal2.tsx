@@ -1,11 +1,11 @@
 import LoginModal from './LoginModal';
 import { Location } from './Location';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { machineDB, auth } from '../firebaseConfig';
-import { useAppContext } from './AppContextProvider';
 import { ref, child, get, set } from 'firebase/database';
 import { View, Text, StyleSheet, Modal, Button, Image } from 'react-native';
+import { AuthContext } from './AuthContext';
 
 type NewLocationModalProps = {
   locations: Location[];
@@ -17,7 +17,7 @@ type NewLocationModalProps = {
 
 const NewLocationModal: React.FC<NewLocationModalProps> = ({ location, closeNewLocationModal, newLocationModalVisible, setLocations }) => {
   const dbRef = ref(machineDB);
-  const { user, updateUser } = useAppContext();
+  const { currentUser } = useContext(AuthContext);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [locationExists, setLocationExists] = useState<boolean | null>(null);
   
@@ -43,13 +43,6 @@ const NewLocationModal: React.FC<NewLocationModalProps> = ({ location, closeNewL
     }
   }, [location]);
 
-  // Listen to state changes of the user and pass that along as needed
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      updateUser(user);
-    });
-
-  }, []);
 
   // Create a function to add a location to the database
   const addLocationToDatabase = (location: Location | null | undefined) => {
@@ -75,7 +68,7 @@ const NewLocationModal: React.FC<NewLocationModalProps> = ({ location, closeNewL
 
     if (!locationExists) {
       return (<>
-        { user ? (
+        { currentUser ? (
           <Button
           title="Add this place to the database"
           onPress={() => {

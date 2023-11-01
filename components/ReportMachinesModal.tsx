@@ -1,15 +1,15 @@
 
 import { Camera, CameraType } from 'expo-camera';
 import { machineDB, auth } from '../firebaseConfig';
-import { useAppContext } from './AppContextProvider';
 import CameraModal from './CameraModal';
 import { ref, child, update, get, set } from 'firebase/database';
-import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
+import React, { useState, Dispatch, SetStateAction, useRef, useEffect, useContext } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar, ActivityIndicator} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
 import ReportBox from './reportBox';
 import { storage } from '../firebaseConfig';
 import { getDownloadURL, ref as storageRef, uploadBytes, uploadString, uploadBytesResumable } from 'firebase/storage';
+import { AuthContext } from './AuthContext';
 
 // Set the types to be expected into this modal as a props
 interface ReportMachinesModalProps {
@@ -38,7 +38,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         bottle: { count: 0, status: [] },
     });
 
-    const { user, updateUser } = useAppContext();
+    const { currentUser } = useContext(AuthContext);
 
     // Close down this modal when we need to
     const handleClose = () => {
@@ -133,7 +133,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         const imageUri = await getDownloadURL(imageRef);
 
         const newReview: Review = {
-            'user': user?.email as string,
+            'user': currentUser?.email as string,
             'date': currentDate.toLocaleDateString(),
             'machineData': machineData,
             'imageUri': imageUri

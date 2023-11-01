@@ -1,7 +1,6 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState, Dispatch, SetStateAction, useContext } from 'react';
 import LocationModal from './LocationModal';
 import { Location, MachineStatus } from './Location';
-import { useAppContext } from './AppContextProvider';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TouchableHighlight, Modal } from 'react-native';
 
 
@@ -71,8 +70,8 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
                   <Text style={styles.locationStatus}>{`🥫 ${goodMachinesCount}`} machines</Text>
                 </View>
                 <LocationModal 
-                  placeID={placeID}
-                  location={location}
+                  placeID={selectedLocation.placeID}
+                  location={selectedLocation}
                   isLocationModalVisible={isLocationModalVisible}
                   setLocationModalVisible={setLocationModalVisible}
                   updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
@@ -90,7 +89,7 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
       animationType='slide'
       transparent={true}
       visible={props.isLocationListVisible}
-      onRequestClose={() => props}>
+      onRequestClose={() => props.setLocationListVisible(false)}>
 
       <View style={styles.mainView}>
 

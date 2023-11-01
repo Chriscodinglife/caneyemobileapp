@@ -1,10 +1,11 @@
-import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
-import { useAppContext } from './AppContextProvider';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, Dispatch, SetStateAction, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import LoginModal from './LoginModal';
+import { AuthContext } from './AuthContext'
+
 
 interface AccountModalProps {
     isAccountModalVisible: boolean;
@@ -13,16 +14,22 @@ interface AccountModalProps {
 
 const AccountModal: React.FC<AccountModalProps> = (props: AccountModalProps) => {
 
-    const { user, updateUser } = useAppContext();
+    const { currentUser, signOut } = useContext(AuthContext);
     const [loginModalVisible, setLoginModalVisible] = useState(false);
-    // Listen to state changes of the user and pass that along as needed
-    useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
-        updateUser(user);
-        });
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    }, []);
+    const sleep = (ms: number) => {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+      
 
+    const handleLogout = async () => {
+        setIsLoading(true);
+        await sleep(500);
+        signOut();
+        setIsLoading(false);
+        Alert.alert("Log Out Successful!", "You were able to log out!\n\nSee you again soon!")
+    };
 
     return (
         <Modal
@@ -44,13 +51,18 @@ const AccountModal: React.FC<AccountModalProps> = (props: AccountModalProps) => 
 
                     <View style={styles.userInfoContainer}>
 
-                        { user ? (
+                        { currentUser ? (
                             <>
-                                <Text style={styles.userEmailText}>Email: {user?.email}</Text>
+                                <Text style={styles.userEmailText}>Email: {currentUser?.email}</Text>
 
-                                <TouchableOpacity style={styles.logButton} onPress={() => updateUser(null)}>
-                                    <Text style={styles.logButtonText}>Logout</Text>
-                                </TouchableOpacity>
+                                {!isLoading ? (
+                                    <TouchableOpacity style={styles.logButton} onPress={handleLogout}>
+                                        <Text style={styles.logButtonText}>Logout</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <ActivityIndicator size={"large"} color={'grey'} />
+                                )}
+                                
                             </>
                         ) : (
                             <>

@@ -128,13 +128,11 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 						{/* END OF ANIMATION BARS */}
 
 						<View style={styles.reportImageHeader}>
-							{/* THE AVATAR AND USERNAME  */}
 							<View style={styles.reportHeaderDate}>
 								<Text style={styles.reportHeaderDateText}>
 									Posted on {content[current]?.date}
 								</Text>
 							</View>
-							{/* END OF THE AVATAR AND USERNAME */}
 
 							{/* THE CLOSE BUTTON */}
 							<TouchableOpacity onPress={() => close()}>

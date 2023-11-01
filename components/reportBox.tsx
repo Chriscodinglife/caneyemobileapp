@@ -11,8 +11,6 @@ interface ReportBoxProps {
 
 const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
-    const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
-
     const goodGlassMachines = props.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
     const goodCanMachines = props.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
     const goodBottleMachines = props.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
