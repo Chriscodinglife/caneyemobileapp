@@ -60,13 +60,6 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     };
 
-    // useEffect(() => {
-    //     if (picture) {
-    //         console.log(picture);
-    //     }
-    // }, [picture]);
-
-
     useEffect(() => {
         // When the user confirms the picture, close the modal and proceed to the next step
 

@@ -85,8 +85,6 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 		props.closeLocationReportListModal(false);
 	};
 
-  console.log("what the hell is this " + content[current].imageUri as string);
-
   return (
     <Modal
       animationType='slide'

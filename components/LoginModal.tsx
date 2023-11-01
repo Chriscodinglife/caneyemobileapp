@@ -17,7 +17,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
       
       try {
         const response = await signInUser(email, password);
-        console.log(response);
         alert("You have successfully signed in!")
         setLoginModalVisible(false);
       } catch (error: any) {
@@ -34,7 +33,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
 
       try {
         const response = await createUser(email, password);
-        console.log(response);
         alert("Check your email to verify your account.")
       } catch (error: any) {
         console.log(error);

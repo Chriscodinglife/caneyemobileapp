@@ -11,6 +11,7 @@ import { Location,} from './components/Location';
 import { StyleSheet, View } from 'react-native';
 import AccountModal from './components/AccountModal';
 import { AuthProvider } from './components/AuthContext'
+import { PROVIDER_GOOGLE } from 'react-native-maps';
 
 
 export default function App() {
@@ -66,7 +67,7 @@ export default function App() {
         <GoogleSearchBar 
           setLocations={setLocations}/>
         <MapView 
-          provider='google' 
+          provider={PROVIDER_GOOGLE}
           style={styles.map}
           showsUserLocation={true}
           initialRegion={{
