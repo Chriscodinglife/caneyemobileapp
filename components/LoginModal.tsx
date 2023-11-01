@@ -1,6 +1,6 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { auth } from '../firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, } from "firebase/auth";
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Modal, TouchableOpacity, Image, Platform, TouchableWithoutFeedback, Keyboard, } from 'react-native';
 
 type LoginModalProps = {
@@ -12,7 +12,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ loginModalVisible, setLoginModa
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-
 
     const signIn = async () => {
       setLoading(true);
