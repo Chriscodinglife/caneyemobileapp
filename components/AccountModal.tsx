@@ -1,7 +1,5 @@
-import { View, Text, Modal, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
-import React, { useState, useEffect, Dispatch, SetStateAction, useContext } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, Dispatch, SetStateAction, useContext } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import LoginModal from './LoginModal';
 import { AuthContext } from './AuthContext'
