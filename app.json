@@ -8,9 +8,9 @@
     "scheme": "caneyeapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./images/caneye_splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#B4E7AB"
     },
     "assetBundlePatterns": [
       "**/*"
