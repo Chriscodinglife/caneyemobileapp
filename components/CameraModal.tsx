@@ -56,6 +56,11 @@ const CameraModal: React.FC<CameraModalProps> = (props: CameraModalProps) => {
         setCapturedPicture(null);
         setSelectedPicture(null);
       };
+
+      const skipClosecamera = () => {
+        props.handleNext();
+        props.setCameraModalVisible(false);
+      }
     
       useEffect(() => {
         // When the user confirms the picture, close the modal and proceed to the next step
@@ -85,22 +90,25 @@ const CameraModal: React.FC<CameraModalProps> = (props: CameraModalProps) => {
                   <Camera style={styles.camera} type={type} ref={(ref) => (cameraRef.current = ref)} />
                 )}
                 {!isPreviewing && !isConfirmed && (
+                  <>
                   <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
                     <Entypo name="circle" size={80} color="white" />
                   </TouchableOpacity>
-                )}
-                {!isPreviewing && !isConfirmed && (
                   <TouchableOpacity style={styles.selectButton} onPress={selectPicture}>
-                    <Text style={styles.captureButtonText}>Select</Text>
+                    <Text style={styles.text}>Select</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.skipButton} onPress={skipClosecamera}>
+                    <Text style={styles.text}>Skip</Text>
+                  </TouchableOpacity>
+                  </>
                 )}
                 {isPreviewing && !isConfirmed && (
                   <>
                   <TouchableOpacity style={styles.retakeButton} onPress={retakePicture}>
-                    <Text style={styles.captureButtonText}>Retake Picture</Text>
+                    <Text style={styles.text}>Retake Picture</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.confirmButton} onPress={confirmPicture}>
-                    <Text style={styles.captureButtonText}>Confirm</Text>
+                    <Text style={styles.text}>Confirm</Text>
                   </TouchableOpacity>
                   </>
                 )}
@@ -140,6 +148,15 @@ const CameraModal: React.FC<CameraModalProps> = (props: CameraModalProps) => {
         padding: 10,
         borderRadius: 50,
       },
+      skipButton: {
+        alignSelf: 'center',
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 50,
+      },
       confirmButton: {
         alignSelf: 'center',
         position: 'absolute',
@@ -158,7 +175,7 @@ const CameraModal: React.FC<CameraModalProps> = (props: CameraModalProps) => {
         padding: 10,
         borderRadius: 50,
       },
-      captureButtonText: {
+      text: {
         fontSize: 18,
         color: 'black',
       },

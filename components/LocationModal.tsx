@@ -14,25 +14,15 @@ interface LocationModalProps {
   isLocationModalVisible: boolean;
   setLocationModalVisible: Dispatch<SetStateAction<boolean>>;
   updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
+  setSelectedLocation: Dispatch<SetStateAction<Location>>;
 }
 
 const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) => {
-  
+
   const { currentUser } = useContext(AuthContext)
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [reportMachinesModalVisible, setReportMachinesModalVisible] = useState(false);
-
-  // Check if the current user exists on the initial render.
-  useEffect(() => {
-    if (currentUser !== null) {
-      console.log("Well hello there muthafucka")
-    }
-  }, [currentUser])
-
-  const numberOfReports = props.location?.reviews?.length ?? 0;
-  const lastReviewPosition = props.location.reviews?.length as number - 1;
-  const lastReviewMachinedata = props.location.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
-
+  const [numberOfReports, setNumberOfReports] = useState<number>(props.location.reviews?.length ?? 0)
 
   return (
       <Modal
@@ -60,10 +50,9 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
 
             <View style={styles.reviewActions}>
 
-              { numberOfReports > 0 ? ( 
+              { numberOfReports as number > 0 ? ( 
                 <View style={styles.reportBoxContainer}>
                   <ReportBoxWithListOption
-                    machineData={lastReviewMachinedata}
                     location={props.location}
                     showReportBoxFooter={true}/>
                 </View>
@@ -103,7 +92,8 @@ const LocationModal: React.FC<LocationModalProps> = (props: LocationModalProps) 
                       location={props.location}
                       reportMachinesModalVisible={reportMachinesModalVisible}
                       updateLocationAtThisPlaceID={props.updateLocationAtThisPlaceID}
-                      setReportMachinesModalVisible={setReportMachinesModalVisible} />
+                      setReportMachinesModalVisible={setReportMachinesModalVisible} 
+                      setSelectedLocation={props.setSelectedLocation}/>
                   </>
                 )
                 : (

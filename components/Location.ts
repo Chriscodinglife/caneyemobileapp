@@ -1,13 +1,13 @@
 // Set some types so we can track the status across different machines
 export type MachineIndex = number;
 export type MachineType = 'glass' | 'can' | 'bottle';
-export type MachineStatus = 'thumbsUp' | 'repairNeeded';
+export type MachineStatus = 'thumbsUp' | 'repairNeeded' | null;
 
 // Set the expected types for the machine types
 export type MachineData = {
-    glass: { count: number; status: MachineStatus[] };
-    can: { count: number; status: MachineStatus[] };
-    bottle: { count: number; status: MachineStatus[] };
+    glass: { count: number; status: MachineStatus[] | undefined };
+    can: { count: number; status: MachineStatus[] | undefined };
+    bottle: { count: number; status: MachineStatus[] | undefined };
 };
 
 export type Review = {

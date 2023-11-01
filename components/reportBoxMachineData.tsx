@@ -1,40 +1,33 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
-import { MachineStatus, MachineData, Location, Review } from './Location';
+import { MachineStatus, MachineData, Location } from './Location';
 import LocationReportListModal from './LocationReportListModal';
 
-interface ReportBoxProps {
-    location: Location;
-    showReportBoxFooter: boolean;
+interface ReportBoxMachineDataProps {
+    machineData: MachineData;
 }
 
-const ReportBoxWithListOption: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
-
-    const [locationReportListModalVisible, setLocationReportListModalVisible] = useState(false);
+const ReportBoxMachineData: React.FC<ReportBoxMachineDataProps> = (props: ReportBoxMachineDataProps) => {
 
     let goodGlassMachines = 0;
     let goodCanMachines = 0;
     let goodBottleMachines = 0;
 
-    const lastReviewPosition = props.location.reviews?.length as number - 1;
-    const lastReview = props.location?.reviews ? props.location.reviews[lastReviewPosition] : undefined;
-    const lastReviewMachinedata = props.location?.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
-
-    if (lastReviewMachinedata?.glass.status) {
-      goodGlassMachines = lastReviewMachinedata?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    if (props.machineData.glass.status) {
+      goodGlassMachines = props.machineData.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
     }
 
-    if (lastReviewMachinedata?.can.status) {
-      goodCanMachines = lastReviewMachinedata?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    if (props.machineData.can.status) {
+      goodCanMachines = props.machineData.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
     }
 
-    if (lastReviewMachinedata?.bottle.status) {
-      goodBottleMachines = lastReviewMachinedata?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    if (props.machineData.bottle.status) {
+      goodBottleMachines = props.machineData.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
     };
 
-    const numberGlassMachines = lastReviewMachinedata?.glass.count ?? 0;
-    const numberCanMachines = lastReviewMachinedata?.can.count ?? 0;
-    const numberBottleMachines = lastReviewMachinedata?.bottle.count ?? 0;
+    const numberGlassMachines = props.machineData.glass.count ?? 0;
+    const numberCanMachines = props.machineData.can.count ?? 0;
+    const numberBottleMachines = props.machineData.bottle.count ?? 0;
 
     const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
     const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;
@@ -63,24 +56,6 @@ const ReportBoxWithListOption: React.FC<ReportBoxProps> = (props: ReportBoxProps
                 </View>
 
             </View>
-
-            { props.showReportBoxFooter ? (
-                <>
-                <View style={styles.reportBoxFooter}>
-
-                    <Text style={styles.reportBoxDate}>Posted on {lastReview?.date}</Text>
-                    
-                    <TouchableOpacity style={styles.seeMoreReports} onPress={() => setLocationReportListModalVisible(true)}>
-                        <Text style={styles.seeMoreReportsText}>{`See Past Reports >`}</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <LocationReportListModal 
-                    location={props.location as Location}
-                    isLocationReportListModalVisible={locationReportListModalVisible}
-                    closeLocationReportListModal={setLocationReportListModalVisible}/>
-                </>
-            ) : null }
 
         </View>
     );
@@ -177,4 +152,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ReportBoxWithListOption;
+export default ReportBoxMachineData;

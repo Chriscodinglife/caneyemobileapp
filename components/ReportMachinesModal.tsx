@@ -6,7 +6,7 @@ import { ref, child, update, get, set } from 'firebase/database';
 import React, { useState, Dispatch, SetStateAction, useRef, useEffect, useContext } from 'react';
 import { View, Text, Modal, Button, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, ImageBackground, Dimensions, StatusBar, ActivityIndicator} from 'react-native';
 import { Location, MachineIndex, MachineType, MachineStatus, MachineData, Review } from './Location';
-import ReportBox from './reportBox';
+import ReportBoxMachineData from './reportBoxMachineData';
 import { storage } from '../firebaseConfig';
 import { getDownloadURL, ref as storageRef, uploadBytes, uploadString, uploadBytesResumable } from 'firebase/storage';
 import { AuthContext } from './AuthContext';
@@ -18,6 +18,7 @@ interface ReportMachinesModalProps {
     reportMachinesModalVisible: boolean;
     updateLocationAtThisPlaceID: (location: Location, placeID: string | null) => void;
     setReportMachinesModalVisible: Dispatch<SetStateAction<boolean>>;
+    setSelectedLocation: Dispatch<SetStateAction<Location>>;
 }
 
 const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMachinesModalProps) => {
@@ -53,6 +54,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             bottle: { count: 0, status: [] },
         });
         props.setReportMachinesModalVisible(false);
+
     };
 
     // useEffect(() => {
@@ -64,6 +66,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     useEffect(() => {
         // When the user confirms the picture, close the modal and proceed to the next step
+
         if (step === 4) {
           setCameraModalVisible(true);
         }
@@ -84,19 +87,18 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
     // Increase the step by 1 and then reset the machineData if needed
     const handleNext = () => {
-        if (step <= 3) {
 
-            const count = (machineData as MachineData)[machineStepType as MachineType].count;
-            const countStatus = (machineData as MachineData)[machineStepType as MachineType].status.length;
+        const count = (machineData as MachineData)[machineStepType as MachineType].count;
 
-            if (count != countStatus) {
-                // Check if a selection has been made, show an alert if not
-                Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
-                return;
-            } else if (count == 0) {
-                Alert.alert('Selection Required', 'Please add a machine!');
-                return;
-            }
+        let length = 0
+        if ((machineData as MachineData)[machineStepType as MachineType].status) {
+            length = (machineData as MachineData)[machineStepType as MachineType].status?.length as number;
+        };
+        
+        if (count != length) {
+            // Check if a selection has been made, show an alert if not
+            Alert.alert('Selection Required', 'After adding a machine, make sure to select either 👍 or 🛠️');
+            return;
         };
 
         setStep(step + 1);
@@ -113,34 +115,48 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
         const currentDate = new Date();
 
-        // Get the Image URL from firebase
-        const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-              resolve(xhr.response);
-            };
-            xhr.onerror = function (e) {
-              reject(new TypeError("Network request failed"));
-            };
-            xhr.responseType = "blob";
-            xhr.open("GET", picture as string, true);
-            xhr.send(null);
-        });
+        let newReview: Review = {
+            user: "",
+            date: "",
+            imageUri: ""
+        }
 
-        const imageRef = storageRef(storage, 'reportImages/' + currentDate.toString() + props.placeID);
-        const metadata = {contentType: 'image/jpeg'};
-        const uploadTask = await uploadBytesResumable(imageRef, blob as Blob, metadata);
-        const imageUri = await getDownloadURL(imageRef);
+        if (picture) {
+            // Get the Image URL from firebase
+            const blob = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                resolve(xhr.response);
+                };
+                xhr.onerror = function (e) {
+                reject(new TypeError("Network request failed"));
+                };
+                xhr.responseType = "blob";
+                xhr.open("GET", picture as string, true);
+                xhr.send(null);
+            });
 
-        const newReview: Review = {
-            'user': currentUser?.email as string,
-            'date': currentDate.toLocaleDateString(),
-            'machineData': machineData,
-            'imageUri': imageUri
+            const imageRef = storageRef(storage, 'reportImages/' + currentDate.toString() + props.placeID);
+            const metadata = {contentType: 'image/jpeg'};
+            const uploadTask = await uploadBytesResumable(imageRef, blob as Blob, metadata);
+            const imageUri = await getDownloadURL(imageRef);
+
+            newReview = {
+                'user': currentUser?.email as string,
+                'date': currentDate.toLocaleDateString(),
+                'machineData': machineData,
+                'imageUri': imageUri
+            };
         };
 
-        console.log("Starting Location add")
-        const addReviewToLocation = (location: Location | null | undefined) => {
+        newReview = {
+            'user': currentUser?.email as string,
+            'date': currentDate.toLocaleDateString(),
+            'machineData': machineData
+        };
+
+
+        const addReviewToLocation = async (location: Location | null | undefined) => {
 
             if (!location) {
                 console.error("Location is null or undefined");
@@ -149,7 +165,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
             const locationRef = child(dbRef, `machines/${location?.placeID}`);
 
-            get(locationRef).then((snapshot) => {
+            await get(locationRef).then((snapshot) => {
 
                 if (snapshot.exists()) {
                     const currentLocationData = snapshot.val();
@@ -160,15 +176,16 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
                     // Add a new entry to the reviews array for the location
                     currentLocationData.reviews.push(newReview);
-
-                    currentLocationData.recentReview = newReview;
-
                     // Update the location locally and in the database
                     props.updateLocationAtThisPlaceID(currentLocationData, props.placeID);
 
+                
                     update(locationRef, currentLocationData)
                     .then(() => {
                         console.log("New Review Added");
+                        // Update the current location modal
+                        props.setSelectedLocation(currentLocationData);
+                        
                     })
                     .catch((error) => {
                         console.error("Error adding review");
@@ -185,14 +202,17 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                     // Add a new entry to the reviews array for the location
                     currentLocationData.reviews.push(newReview);
 
-                    currentLocationData.recentReview = newReview;
-
                     // Update the location locally and in the database
                     props.updateLocationAtThisPlaceID(currentLocationData, props.placeID);
 
+                    
                     set(locationRef, currentLocationData)
                     .then(() => {
                         console.log("New Review Added with New Location");
+                        // Update the current location modal
+                        props.setSelectedLocation(currentLocationData);
+
+                        
                     })
                     .catch((error) => {
                         console.error("Error adding review");
@@ -216,9 +236,10 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             can: { count: 0, status: [] },
             bottle: { count: 0, status: [] },
         });
+        setIsUploading(false);
         props.setReportMachinesModalVisible(false);
 
-        setIsUploading(false);
+        
         
     };
 
@@ -228,7 +249,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         // Get the current machine data
         const currentMachineData = { ...machineData[machineType] };
 
-        currentMachineData.status[machineIndex] = 'thumbsUp';
+        if (currentMachineData.status) { 
+            currentMachineData.status[machineIndex] = 'thumbsUp';
+        }
 
         setMachineData({
         ...machineData,
@@ -242,8 +265,9 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         // Get the current machine data
         const currentMachineData = { ...machineData[machineType] };
 
-
-        currentMachineData.status[machineIndex] = 'repairNeeded';
+        if (currentMachineData.status) {
+            currentMachineData.status[machineIndex] = 'repairNeeded';
+        }
 
         setMachineData({
         ...machineData,
@@ -270,9 +294,11 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
         const currentMachineData = { ...machineData[machineType] };
         currentMachineData.count = Math.max(0, currentMachineData.count - 1);
         
-        if (currentMachineData.status.length > 0) {
-            currentMachineData.status.pop();
-        }
+        if (currentMachineData.status) {
+            if (currentMachineData.status.length > 0) {
+                currentMachineData.status.pop();
+            };
+        };
         
         setMachineData({
         ...machineData,
@@ -294,15 +320,21 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
             <View style={styles.scrollMachines}>
               <ScrollView>
                 { machines?.map( (machine, index) => { 
-                    const status = currentMachineData.status[index];
+
+                    let status: MachineStatus[] = [];
+
+                    if (currentMachineData.status) {
+                        status = currentMachineData.status;
+                    };
+
                   return ( 
                     <View style={styles.machineRow} key={index}>
                         <Text style={styles.machineRowName}>{capitalizeFirstLetter(machineType)} Machine {index + 1} </Text>
-                        <TouchableOpacity style={status === 'thumbsUp' ? styles.greenButton : styles.machineRowButtonFlex} onPress={() => handleThumbsUp(machineType, index)}> 
+                        <TouchableOpacity style={status[index] === 'thumbsUp' ? styles.greenButton : styles.machineRowButtonFlex} onPress={() => handleThumbsUp(machineType, index)}> 
                             <Text style={styles.machineRowThumbs}>👍</Text>
                             <Text>{`Looks\nGood!`}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={status === 'repairNeeded' ? styles.redButton : styles.machineRowButtonFlex} onPress={() => handleNeedsRepair(machineType, index)}>
+                        <TouchableOpacity style={status[index] === 'repairNeeded' ? styles.redButton : styles.machineRowButtonFlex} onPress={() => handleNeedsRepair(machineType, index)}>
                             <Text style={styles.machineRowFix}>🛠️</Text>
                             <Text>{`Needs\nFixing!`}</Text>
                         </TouchableOpacity>
@@ -395,7 +427,8 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
 
                         {reportBoxVisible ? (
                             <View style={styles.reportBoxContainer}>
-                                <ReportBox machineData={machineData} location={null} showReportBoxFooter={false}/>
+                                <ReportBoxMachineData
+                                    machineData={machineData} />
                             </View>
                         ) : null }
                         

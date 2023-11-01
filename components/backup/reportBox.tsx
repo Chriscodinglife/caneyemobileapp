@@ -4,20 +4,22 @@ import { MachineStatus, MachineData, Location } from './Location';
 import LocationReportListModal from './LocationReportListModal';
 
 interface ReportBoxProps {
-    machineData: MachineData | undefined;
     location: Location | null;
     showReportBoxFooter: boolean;
 }
 
 const ReportBox: React.FC<ReportBoxProps> = (props: ReportBoxProps) => {
 
-    const goodGlassMachines = props.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-    const goodCanMachines = props.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-    const goodBottleMachines = props.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+    const lastReviewPosition = props.location?.reviews?.length as number - 1;
+    const lastReviewMachinedata = props.location?.reviews ? props.location.reviews[lastReviewPosition].machineData : undefined;
 
-    const numberGlassMachines = props.machineData?.glass.count ?? 0;
-    const numberCanMachines = props.machineData?.can.count ?? 0;
-    const numberBottleMachines = props.machineData?.bottle.count ?? 0;
+    const goodGlassMachines = lastReviewMachinedata?.glass.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+    const goodCanMachines = lastReviewMachinedata?.can.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+    const goodBottleMachines = lastReviewMachinedata?.bottle.status?.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
+
+    const numberGlassMachines = lastReviewMachinedata?.glass.count ?? 0;
+    const numberCanMachines = lastReviewMachinedata?.can.count ?? 0;
+    const numberBottleMachines = lastReviewMachinedata?.bottle.count ?? 0;
 
     const goodMachinesCount = goodGlassMachines + goodCanMachines + goodBottleMachines;
     const totalMachineCount = numberGlassMachines + numberCanMachines + numberBottleMachines;

@@ -48,10 +48,26 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
 
     for (let placeID in props.locations) {
       const location = props.locations[placeID];
-      const goodGlassMachines = location.recentReview?.machineData?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-      const goodCanMachines = location.recentReview?.machineData?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
-      const goodBottleMachines = location.recentReview?.machineData?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length ?? 0;
 
+    let goodGlassMachines = 0;
+    let goodCanMachines = 0;
+    let goodBottleMachines = 0;
+
+    const lastReviewPosition = location?.reviews?.length as number - 1;
+    const lastReviewMachinedata = location?.reviews ? location.reviews[lastReviewPosition].machineData : undefined;
+
+    if (lastReviewMachinedata?.glass.status) {
+      goodGlassMachines = lastReviewMachinedata?.glass.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    }
+
+    if (lastReviewMachinedata?.can.status) {
+      goodCanMachines = lastReviewMachinedata?.can.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    }
+
+    if (lastReviewMachinedata?.bottle.status) {
+      goodBottleMachines = lastReviewMachinedata?.bottle.status.filter((status: MachineStatus) => status === 'thumbsUp').length;
+    };
+    
       const numberGlassMachines = location.recentReview?.machineData?.glass.count ?? 0;
       const numberCanMachines = location.recentReview?.machineData?.can.count ?? 0;
       const numberBottleMachines = location.recentReview?.machineData?.bottle.count ?? 0;

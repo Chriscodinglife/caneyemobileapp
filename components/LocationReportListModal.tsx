@@ -1,5 +1,5 @@
-import { Review, MachineStatus, Location } from './Location';
-import ReportBox from './reportBox';
+import { Review, MachineStatus, Location, MachineData } from './Location';
+import ReportBoxMachineData from './reportBoxMachineData';
 import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,8 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
     };
 
   },[props.location])
+
+  console.log(props.location.imageURL);
 
   
 	// current is for get the current content is now playing
@@ -96,13 +98,16 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
         <View style={styles.containerModal}>
 
 					<View style={styles.backgroundContainer}>
-            <Image onLoadEnd={() => {
+            { props.location.imageURL ? (<Image onLoadEnd={() => {
 									progress.setValue(0);
 									play();
 								}}
 								source={{ uri: content[current]?.imageUri as string}}
-								style={styles.reportImage}
-							/>
+								style={styles.reportImage} />
+            ) : (
+              <View style={styles.reportImageBlank}/>
+            )}
+            
 					</View>
 
 					<View style={styles.reportInteractions}>
@@ -156,10 +161,8 @@ const LocationReportListModal: React.FC<LocationReportListModalProps> = (props: 
 
 					</View>
           <View style={styles.reportBoxContainer}>
-              <ReportBox
-                machineData={content[current]?.machineData}
-                location={props.location}
-                showReportBoxFooter={false}/>
+              <ReportBoxMachineData
+                machineData={content[current]?.machineData as MachineData} />
             </View>
 				</View>
     </Modal>
@@ -178,6 +181,11 @@ const styles = StyleSheet.create({
     width: width, 
     height: height, 
     resizeMode: 'cover'
+  },
+  reportImageBlank: { 
+    width: width, 
+    height: height, 
+    backgroundColor: '#272EE6'
   },
   reportInteractions: {
     flexDirection: 'column',

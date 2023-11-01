@@ -32,11 +32,11 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
 
   };
 
-  const handleSelectedMarker = (location: Location) => {
+  const handleSelectedLocation = (location: Location) => {
     // Handle the selected Marker by setting the Location selected and making the modal visible
     setSelectedLocation(location);
     setLocationModalVisible(true);
-  }
+  };
 
   const renderMarkers = () => {
     // Render all the locations in the database
@@ -50,13 +50,15 @@ const LocationMarkers: React.FC<LocationMarkersProps> = (props: LocationMarkersP
             coordinate={location.location}
             style={styles.marker}
             title={location.name}
-            onPress={() => handleSelectedMarker(location)}/>
+            onPress={() => handleSelectedLocation(location)}/>
             <LocationModal 
             placeID={selectedLocation.placeID}
             location={selectedLocation}
             isLocationModalVisible={isLocationModalVisible}
             setLocationModalVisible={setLocationModalVisible}
-            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
+            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} 
+            setSelectedLocation={setSelectedLocation}/>
+            
         </View>
       );
     };
