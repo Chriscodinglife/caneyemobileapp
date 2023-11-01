@@ -10,7 +10,7 @@ import ReportBoxMachineData from './reportBoxMachineData';
 import { storage } from '../firebaseConfig';
 import { getDownloadURL, ref as storageRef, uploadBytes, uploadString, uploadBytesResumable } from 'firebase/storage';
 import { AuthContext } from './AuthContext';
-import blueBackgroundImage from '../assets/bluebackground.jpg';
+
 
 
 
@@ -154,7 +154,7 @@ const ReportMachinesModal: React.FC<ReportMachinesModalProps> = (props: ReportMa
                 'user': currentUser?.email as string,
                 'date': currentDate.toLocaleDateString(),
                 'machineData': machineData,
-                "imageUri": blueBackgroundImage
+                "imageUri": null
             };
         };
 
