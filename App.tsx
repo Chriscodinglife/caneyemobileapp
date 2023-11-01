@@ -1,17 +1,16 @@
 import MapView from 'react-native-maps';
 import { StatusBar } from 'expo-status-bar';
 import { machineDB } from './firebaseConfig';
-import AddButton from './components/AddButton';
+import CanEyeActionButtons from './components/CanEyeActionButtons';
 import React, { useEffect, useState } from 'react';
 import { ref, child, get} from 'firebase/database';
 import LocationListModal from './components/LocationListModal';
 import LocationMarkers from './components/LocationMarkers';
 import GoogleSearchBar from './components/GoogleSearchBar';
-import NewLocationModal from './components/newLocationModal';
-import { AppContextProvider } from './components/AppContextProvider';
-import { Location, PlaceDetailsResponse, apiKey } from './components/Location';
-import { StyleSheet, Text, View, Modal, TouchableHighlight } from 'react-native';
-import LocationModal from './components/LocationModal';
+import { Location,} from './components/Location';
+import { StyleSheet, View } from 'react-native';
+import AccountModal from './components/AccountModal';
+import { AuthProvider } from './components/AuthContext'
 
 
 export default function App() {
@@ -32,6 +31,7 @@ export default function App() {
   const dbRef = ref(machineDB);
   const [locations, setLocations] = useState<{[placeId:string]: Location}>({});
   const [isLocationListVisible, setLocationListVisible] = useState<boolean>(false);
+  const [isAccountModalVisible, setAccountModalVisible] = useState<boolean>(false);
 
 
   // Get the data from the database to list out to the map
@@ -59,14 +59,9 @@ export default function App() {
     });
   }, []);
 
-
-  const addButtonClickHandler = () => {
-    setLocationListVisible(!isLocationListVisible);
-  };
-
   // Return back the MapView with the locations and a button to add
   return (
-    <AppContextProvider>
+    <AuthProvider>
       <View style={styles.mapContainer}>
         <GoogleSearchBar 
           setLocations={setLocations}/>
@@ -83,15 +78,20 @@ export default function App() {
                 locations={locations} 
                 setLocations={setLocations}/> 
         </MapView>
-        <AddButton onClick={addButtonClickHandler}/>
+        <CanEyeActionButtons
+          setLocationListVisible={setLocationListVisible}
+          setAccountModalVisible={setAccountModalVisible}/>
         <LocationListModal 
           locations={locations} 
           setLocations={setLocations}
           isLocationListVisible={isLocationListVisible} 
           setLocationListVisible={setLocationListVisible} />
+        <AccountModal 
+          isAccountModalVisible={isAccountModalVisible}
+          setAccountModalVisible={setAccountModalVisible}/>
         <StatusBar style="auto" />
       </View>
-    </AppContextProvider>
+    </AuthProvider>
   );
 }
 
