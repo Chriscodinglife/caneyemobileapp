@@ -3,6 +3,7 @@ import React, { useState, Dispatch, SetStateAction, useContext } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import LoginModal from './LoginModal';
 import { AuthContext } from './AuthContext'
+import { User } from 'firebase/auth';
 
 
 interface AccountModalProps {
@@ -12,9 +13,10 @@ interface AccountModalProps {
 
 const AccountModal: React.FC<AccountModalProps> = (props: AccountModalProps) => {
 
-    const { currentUser, signOut } = useContext(AuthContext);
+    const { currentUser, signOut, deleteUser } = useContext(AuthContext);
     const [loginModalVisible, setLoginModalVisible] = useState(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLogoutLoading, setIsLogOutLoading] = useState<boolean>(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState<boolean>(false);
 
     const sleep = (ms: number) => {
         return new Promise((resolve) => setTimeout(resolve, ms));
@@ -22,11 +24,20 @@ const AccountModal: React.FC<AccountModalProps> = (props: AccountModalProps) => 
       
 
     const handleLogout = async () => {
-        setIsLoading(true);
+        setIsLogOutLoading(true);
         await sleep(500);
         signOut();
-        setIsLoading(false);
+        setIsLogOutLoading(false);
         Alert.alert("Log Out Successful!", "You were able to log out!\n\nSee you again soon!")
+    };
+
+    const handleUserDelete = async () => {
+        setIsDeleteLoading(true);
+        await sleep(500);
+        deleteUser();
+        setIsDeleteLoading(false);
+        Alert.alert("Account Deleted", "Sorry to see you go!")
+
     };
 
     return (
@@ -53,9 +64,17 @@ const AccountModal: React.FC<AccountModalProps> = (props: AccountModalProps) => 
                             <>
                                 <Text style={styles.userEmailText}>Email: {currentUser?.email}</Text>
 
-                                {!isLoading ? (
+                                {!isLogoutLoading ? (
                                     <TouchableOpacity style={styles.logButton} onPress={handleLogout}>
                                         <Text style={styles.logButtonText}>Logout</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <ActivityIndicator size={"large"} color={'grey'} />
+                                )}
+
+                                {!isDeleteLoading ? (
+                                    <TouchableOpacity style={styles.logButton} onPress={handleUserDelete}>
+                                        <Text style={styles.logButtonText}>Delete Account</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <ActivityIndicator size={"large"} color={'grey'} />

@@ -1,6 +1,6 @@
 
 import { User } from "firebase/auth";
-import { SignOutUser, userStateListener } from "../firebase/firebase";
+import { SignOutUser, userStateListener, deleteUserAccount } from "../firebase/firebase";
 import { createContext, useState, useEffect, ReactNode } from "react";
 
 interface Props {
@@ -11,7 +11,8 @@ export const AuthContext = createContext({
   // "User" comes from firebase auth-public.d.ts
   currentUser: {} as User | null,
   setCurrentUser: (_user:User) => {},
-  signOut: () => {}
+  signOut: () => {},
+  deleteUser: () => {},
 });
 
 export const AuthProvider = ({ children }: Props) => {
@@ -29,14 +30,20 @@ export const AuthProvider = ({ children }: Props) => {
   // As soon as setting the current user to null, 
   // the user will be redirected to the home page. 
   const signOut = () => {
-    SignOutUser()
-    setCurrentUser(null)
+    SignOutUser();
+    setCurrentUser(null);
+  };
+
+  const deleteUser = () => {
+    deleteUserAccount();
+    setCurrentUser(null);
   }
 
   const value = {
     currentUser, 
     setCurrentUser,
-    signOut
+    signOut,
+    deleteUser
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
