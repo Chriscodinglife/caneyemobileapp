@@ -12,9 +12,22 @@ interface GoogleSearchBarProps {
 
 const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarProps) => {
 
+  // Make a blank location so we can use this later
+  const blankLocation: Location = {
+    name: "",
+    location: {
+      latitude: 0,
+      longitude: 0,
+    },
+    numMachines: 0,
+    address: "",
+    placeID: "",
+    imageURL: "",
+  }
+
   const dbRef = ref(machineDB);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<Location>();
+  const [selectedLocation, setSelectedLocation] = useState<Location>(blankLocation);
   const [placeID, setPlaceID] = useState<string | null>(null);
 
   const updateLocationAtThisPlaceID = (location: Location, placeID: string | null) => {
@@ -54,7 +67,7 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarP
   };
 
   const locationProcessed = (location: Location, placeID: string) => {
-    setCurrentLocation(location);
+    setSelectedLocation(location);
     setPlaceID(placeID);
     setLocationModalVisible(true);
   }
@@ -83,13 +96,14 @@ const GoogleSearchBar: React.FC<GoogleSearchBarProps> = (props: GoogleSearchBarP
             language: 'en',
           }}
           styles={searchBarStyle} />
-          { currentLocation ? (
+          { selectedLocation ? (
           <LocationModal 
             placeID={placeID}
-            location={currentLocation}
+            location={selectedLocation}
             isLocationModalVisible={isLocationModalVisible}
             setLocationModalVisible={setLocationModalVisible}
-            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
+            updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} 
+            setSelectedLocation={setSelectedLocation}/>
           ) : (
             <>
             </>
