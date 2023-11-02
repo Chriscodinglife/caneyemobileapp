@@ -69,7 +69,7 @@ export default function App() {
         <MapView 
           provider={PROVIDER_GOOGLE}
           style={styles.map}
-          showsUserLocation={true}
+          showsUserLocation={false}
           initialRegion={{
             latitude: 40.700690718242136, 
             longitude: -73.91815489689029,
