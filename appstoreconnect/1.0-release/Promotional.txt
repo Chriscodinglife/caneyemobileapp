@@ -1,0 +1,5 @@
+User Authentication: Seamlessly sign up and join our community.
+Machine Reporting: Provide reports on machine availability and status.
+Historical Data Access: View past reports provided by other community members.
+Google Maps Integration: Explore recycling locations through Google maps.
+Smart Search Functionality: Easily find nearby recycling points with a Search.
