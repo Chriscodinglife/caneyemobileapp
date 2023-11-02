@@ -14,7 +14,52 @@ import { AuthProvider } from './components/AuthContext'
 import { PROVIDER_GOOGLE } from 'react-native-maps';
 
 
+
 export default function App() {
+
+  const mapStyle = [
+    {
+      "elementType": "labels",
+      "stylers": [
+        {
+          "visibility": "off"
+        }
+      ]
+    },
+    {
+      "featureType": "administrative.land_parcel",
+      "stylers": [
+        {
+          "visibility": "off"
+        }
+      ]
+    },
+    {
+      "featureType": "administrative.neighborhood",
+      "stylers": [
+        {
+          "visibility": "off"
+        }
+      ]
+    },
+    {
+      "featureType": "road.local",
+      "stylers": [
+        {
+          "visibility": "on"
+        }
+      ]
+    },
+    {
+      "featureType": "road.local",
+      "elementType": "geometry",
+      "stylers": [
+        {
+          "visibility": "on"
+        }
+      ]
+    }
+  ];
 
   // Make a blank location so we can use this later
   const blankLocation: Location = {
@@ -69,6 +114,7 @@ export default function App() {
         <MapView 
           provider={PROVIDER_GOOGLE}
           style={styles.map}
+          customMapStyle={mapStyle}
           showsUserLocation={false}
           initialRegion={{
             latitude: 40.700690718242136, 

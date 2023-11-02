@@ -90,7 +90,8 @@ const LocationListModal: React.FC<LocationListModalProps> = (props: LocationList
                   location={selectedLocation}
                   isLocationModalVisible={isLocationModalVisible}
                   setLocationModalVisible={setLocationModalVisible}
-                  updateLocationAtThisPlaceID={updateLocationAtThisPlaceID} />
+                  updateLocationAtThisPlaceID={updateLocationAtThisPlaceID}
+                  setSelectedLocation={setSelectedLocation} />
               </TouchableOpacity>
             </View>
         )
